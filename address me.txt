@@ -1,0 +1,6 @@
+1. Go [https://github.com/] > Sign in
+2. Download [https://desktop.github.com/download/]
+3. Give me [Username or Gmail] for Invite
+4. GitHub Desktop > [Clone repository] > Select Project and Local Path > Clone
+
+5. [Fetch] > coding stuff > add changes > [Commit] > [Push], repeat
