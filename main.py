@@ -93,7 +93,7 @@ class Game:
 	def change_scene(self, new_scene):
 		self.scene = new_scene
 
-DEBUGGING = True
+DEBUGGING = False
 if not DEBUGGING:
 	game = Game()
 	game.run()
