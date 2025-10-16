@@ -11,17 +11,15 @@ class Archive:
 		self.game = game
 
 		self.images = {}
-		togore_image_0 = pygame.image.load('data/togore.bmp').convert_alpha()
-		togore_image_0 = pygame.transform.scale(togore_image_0, (72, 72))
-		
-		togore_image_1 = pygame.image.load('data/togorex464-T.png').convert_alpha()
-		togore_image_1 = pygame.transform.scale_by(togore_image_1, (0.8, 0.8))
+		char_0_icon = pygame.image.load('data/images/man_icon.png').convert_alpha()
+		char_0_art = pygame.image.load('data/images/man_art.png').convert_alpha()
 		
 		one_image = pygame.image.load('data/images/numba1.png').convert_alpha()
+		one_image = pygame.transform.scale_by(one_image, (2, 0.2))
 
-		self.images['togore0'] = Image(togore_image_0,50,75)
-		self.images['togore1'] = Image(togore_image_1,250,75)
-		self.images['one'] = Image(one_image,750,110)
+		self.images['image0'] = Image(char_0_icon,50,75)
+		self.images['image1'] = Image(char_0_art,650,75)
+		self.images['one'] = Image(one_image,150,200)
 
 		self.buttons = {}
 		self.buttons['buttonname'] = Button(None,pygame.Rect(200, 450, 100, 50),[(0,255,0),'TEXT HERE',(247,13,26),24],[(0,190,0),None,None,None])
