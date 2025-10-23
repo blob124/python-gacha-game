@@ -45,9 +45,9 @@ class Game:
 		self.char_obtained = {}
 
 		try:
-			with open('data/characterlist.txt','r') as f:
-				for line in f:
-					name,path_to_image,rarity,power,w = line.strip().split('_')
+			with open('data/characterlist.txt','r') as charFile:
+				for line in charFile:
+					name,path_to_image,rarity,power,_ = line.strip().split('_')
 					try:
 						image_art = pygame.image.load(f'data/art/{path_to_image}.png').convert_alpha()
 					except:
@@ -59,7 +59,7 @@ class Game:
 						image_profile = pygame.image.load('data/togore.bmp').convert_alpha()
 					
 					image_profile = pygame.transform.scale(image_profile, (80, 80))
-					self.data[name]={'rarity':int(rarity), 'power':int(power), 'w':int(w), 'icon':image_profile, 'art':image_art}
+					self.data[name] = Character(name,rarity,power,image_profile,image_art)
 		except:
 			print('character data file not found :sad:')
 			pygame.quit()
@@ -92,6 +92,14 @@ class Game:
 
 	def change_scene(self, new_scene):
 		self.scene = new_scene
+
+class Character:
+	def __init__(self, name, rarity, power, icon_image, art_image):
+		self.name = name
+		self.rarity = rarity
+		self.power = power
+		self.imgIcon = icon_image
+		self.imgArt = art_image
 
 DEBUGGING = False
 if not DEBUGGING:
