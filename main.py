@@ -48,18 +48,7 @@ class Game:
 			with open('data/characterlist.txt','r') as charFile:
 				for line in charFile:
 					name,path_to_image,rarity,power = line.strip().split('_')
-					try:
-						image_art = pygame.image.load(f'data/art/{path_to_image}.png').convert_alpha()
-					except:
-						image_art = pygame.image.load('data/togorex464-T.png').convert_alpha()
-					
-					try:
-						image_profile = pygame.image.load(f'data/icons/{path_to_image}.png').convert_alpha()
-					except:
-						image_profile = pygame.image.load('data/togore.bmp').convert_alpha()
-					
-					image_profile = pygame.transform.scale(image_profile, (80, 80))
-					self.data[name] = Character(name,rarity,power,image_profile,image_art)
+					self.data[name] = Character(name,rarity,power,path_to_image)
 		except:
 			print('character data file not found :sad:')
 			pygame.quit()
@@ -94,16 +83,47 @@ class Game:
 		self.scene = new_scene
 
 class Character:
-	def __init__(self, name, rarity, power, icon_image, art_image):
+	def __init__(self, name, rarity, power, image_path):
 		self.name = name
 		self.rarity = rarity
 		self.power = power
-		self.imgIcon = icon_image
-		self.imgArt = art_image
+
+		self.imgpath = image_path
+		self.imgIcon = None
+		self.imgArt = None
+	
+	def getIcon(self):
+		if self.imgIcon is None:
+			try:
+				icon = pygame.image.load(f'data/images/{self.imgpath}_icon.png').convert_alpha()
+				icon = pygame.transform.scale(icon, (80, 80))
+				self.imgIcon = icon
+			except:
+				icon = togoreIcon
+			return icon
+		else:
+			return self.imgIcon
+	
+	def getArt(self):
+		if self.imgArt is None:
+			try:
+				art = pygame.image.load(f'data/images/{self.imgpath}_art.png').convert_alpha()
+				art = pygame.transform.scale(art, (400, 450))
+				self.imgArt = art
+			except:
+				art = togoreArt
+				
+			return art
+		else:
+			return self.imgArt
+
+game = Game()
+togoreIcon = pygame.transform.scale(pygame.image.load('data/togore.bmp').convert_alpha(), (80, 80))
+togoreArt = pygame.transform.scale(pygame.image.load('data/togorex464-T.png').convert_alpha(), (400, 450))
+
 
 DEBUGGING = False
 if not DEBUGGING:
-	game = Game()
 	game.run()
 else:
 	import cProfile
@@ -112,7 +132,7 @@ else:
 		profiler = cProfile.Profile()
 		profiler.enable()
 		
-		Game().run()
+		game.run()
 		
 		profiler.disable()
 		profiler.print_stats(sort="cumtime")

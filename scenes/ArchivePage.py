@@ -11,8 +11,8 @@ class Archive:
 		self.game = game
 
 		self.images = {}
-		char_0_icon = pygame.image.load('data/images/man_icon.png').convert_alpha()
-		char_0_art = pygame.image.load('data/images/man_art.png').convert_alpha()
+		char_0_icon = self.game.data['Man'].getIcon()
+		char_0_art = self.game.data['Man'].getArt()
 		
 		one_image = pygame.image.load('data/images/numba1.png').convert_alpha()
 		one_image = pygame.transform.scale_by(one_image, (2, 0.2))
