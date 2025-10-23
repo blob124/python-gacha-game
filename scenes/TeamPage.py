@@ -9,19 +9,34 @@ EXITTXT = FONT24.render('Press Esc, it stands for Escape!', True, (255, 255, 255
 class Party:
 	def __init__(self,game):
 		self.game = game
+		self.party = [None,None,None,None,None]
+
+		char_0_icon = self.game.data['Man'].getIcon()
 
 		self.images = {}
-		char_0_icon = self.game.data['Man'].getIcon()
-		char_0_art = self.game.data['Man'].getArt()
-		
-		#char_0_icon = pygame.transform.scale_by(char_0_icon, (0.8, 0.8))
-		char_0_art = pygame.transform.scale_by(char_0_art, (0.5, 0.5))
-
 		self.images['image0'] = Image(char_0_icon,50,75)
-		self.images['image1'] = Image(char_0_art,150,300)
+		self.images['powerlevel'] = TextBox(pygame.Rect(80,520,300,50),(0,225,0),'PowerLevel: 0',(255,190,190),32)
+
 
 		self.buttons = {}
-		self.buttons['buttonname'] = Button(None,pygame.Rect(200, 450, 60, 40),[(0,255,0),'TEXT HERE',(247,13,26),24],[(0,190,0),None,None,None])
+		self.buttons['buttonname'] = Button(None,pygame.Rect(950, 520, 80, 40),[(0,255,0),'TEXT HERE',(247,13,26),20],[(0,190,0),None,None,None])
+
+
+		self.updateParty()
+
+	def updateParty(self):
+		for i in range(5):
+			char = self.game.party[i]
+			print(char)
+			if char not in self.game.char_obtained:
+				char = 'PHD'
+			self.party[i] = char
+
+			theart = self.game.data[char].getArt()
+			theart = pygame.transform.scale_by(theart, (0.5, 0.5))
+			self.images[f'slot{i}'] = Image(theart,433+(i-2)*160,300)
+		
+		self.images['powerlevel'].setText(f'PowerLevel: {sum([self.game.data[char].power for char in self.party])}')
 
 	def handle_events(self, events):
 		for event in events:
@@ -43,12 +58,9 @@ class Party:
 		screen.blit(EXITTXT, (20, 20))
 
 		for id,image in self.images.items():
-			if id=='togore0':
-				image.draw(screen,grayscale=True)
-			else:
-				image.draw(screen)
+			image.draw(screen)
 
 		for name,button in self.buttons.items():
 			button.draw(screen)
 		
-		pygame.draw.line(screen, (255,255,255), (650,80), (650,520), 1)
+		pygame.draw.line(screen, (255,255,255), (50,280), (1067-50,280), 1)
