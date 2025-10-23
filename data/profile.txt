@@ -1,15 +1,7 @@
-Bob=0
+[--]
 Man=0
-Reborte EX=1
-Reborte=1
-Togore=3
-John=2
-Tommy=1
-Soggy=3
-Chopstick=6
-Sushi-san=11
-Dwarf=11
-Fake sword=13
-Stick=22
-Dog=36
-Dog's food=20
+PHD=0
+[--]
+Man,,,
+[--]
+1000
