@@ -3,6 +3,8 @@ import random
 import sys
 
 from scenes.GachaPage import GachaPlace
+from scenes.MissionPage import Mission
+from scenes.TeamPage import Party
 from scenes.ArchivePage import Archive
 from scenes.OptionPage import Settings
 
@@ -15,7 +17,11 @@ class Game:
 		self.clock = pygame.time.Clock()
 
 		self.loadData()
-		self.scenes = {'GachaPlace':GachaPlace(self), 'ArchivePage':Archive(self), 'OptionPage':Settings(self)}
+		self.scenes = {	'GachaPlace':GachaPlace(self),
+						'Missions':Mission(self),
+						'TeamUp':Party(self),
+						'ArchivePage':Archive(self),
+						'OptionPage':Settings(self)}
 
 		pygame.mixer.init()
 		pygame.mixer.music.load(f'data/sfx/music.mp3')
@@ -43,6 +49,7 @@ class Game:
 	def loadData(self):
 		self.data = {}
 		self.char_obtained = {}
+		self.party = []
 
 		try:
 			with open('data/characterlist.txt','r') as charFile:
@@ -56,18 +63,18 @@ class Game:
 
 		try:
 			with open('data/profile.txt','r') as f:
-				for line in f:
-					name,dup = line.strip().split('=')
+				_,obtain,party,currency = f.read().strip().split('[--]')
+				for char in obtain.strip().split():
+					name,dup = char.split('=') 
 					self.char_obtained[name] = int(dup)
-		except Exception as e:
-			print('no profile, but that\'s fine')
-			print(e)
 
-		try:
-			with open('data/currency.txt','r') as f:
-				self.currency = f.readlines()[0].strip()
-		except:
-			self.currency = 0
+				self.party = party.split(',')
+				self.currency = currency
+				
+		except Exception as e:
+			print(e)
+			pygame.quit()
+			sys.exit()
 	
 	def saveData(self):
 		with open('data/profile.txt','w') as f:

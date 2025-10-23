@@ -14,8 +14,10 @@ class GachaPlace:
 		self.justroll = []
 		self.buttons = {}
 		self.buttons['roll1'] = Button(None,pygame.Rect(200, 450, 100, 50),[(255,255,0),'roll1',(247,13,26),40],[(190,190,0),None,None,None])
-		self.buttons['goArchive'] = Button(None,pygame.Rect(880, 30, 50, 50),[(255,255,0),'Archive',(247,13,26),18],[(190,190,0),None,None,None])
-		self.buttons['goOption'] = Button(None,pygame.Rect(970, 30, 50, 50),[(255,255,0),'Option',(247,13,26),18],[(190,190,0),None,None,None])
+		self.buttons['goMission'] = Button(None,pygame.Rect(790, 25, 50, 50),[(255,255,0),'Quest',(247,13,26),18],[(190,190,0),None,None,None])
+		self.buttons['goParty'] = Button(None,pygame.Rect(855, 25, 50, 50),[(255,255,0),'Party',(247,13,26),18],[(190,190,0),None,None,None])
+		self.buttons['goArchive'] = Button(None,pygame.Rect(920, 25, 50, 50),[(255,255,0),'Archive',(247,13,26),18],[(190,190,0),None,None,None])
+		self.buttons['goOption'] = Button(None,pygame.Rect(985, 25, 50, 50),[(255,255,0),'Option',(247,13,26),18],[(190,190,0),None,None,None])
 		
 	def handle_events(self, events):
 		for event in events:
@@ -26,6 +28,10 @@ class GachaPlace:
 				if self.status == 0:
 					if self.buttons['roll1'].state == 1: # is Hover
 						self.status = 1
+					elif self.buttons['goMission'].state == 1:
+						self.game.change_scene(self.game.scenes['Missions'])
+					elif self.buttons['goParty'].state == 1:
+						self.game.change_scene(self.game.scenes['TeamUp'])
 					elif self.buttons['goArchive'].state == 1:
 						self.game.change_scene(self.game.scenes['ArchivePage'])
 					elif self.buttons['goOption'].state == 1:
