@@ -47,7 +47,7 @@ class Game:
 		try:
 			with open('data/characterlist.txt','r') as charFile:
 				for line in charFile:
-					name,path_to_image,rarity,power,_ = line.strip().split('_')
+					name,path_to_image,rarity,power = line.strip().split('_')
 					try:
 						image_art = pygame.image.load(f'data/art/{path_to_image}.png').convert_alpha()
 					except:
