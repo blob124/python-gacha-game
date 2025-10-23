@@ -55,7 +55,7 @@ class Game:
 			with open('data/characterlist.txt','r') as charFile:
 				for line in charFile:
 					name,path_to_image,rarity,power = line.strip().split('_')
-					self.data[name] = Character(name,rarity,power,path_to_image)
+					self.data[name] = Character(name,int(rarity),int(power),path_to_image)
 		except:
 			print('character data file not found :sad:')
 			pygame.quit()
@@ -68,8 +68,8 @@ class Game:
 					name,dup = char.split('=') 
 					self.char_obtained[name] = int(dup)
 
-				self.party = party.split(',')
-				self.currency = currency
+				self.party = party.strip().split(',')
+				self.currency = currency.strip()
 				
 		except Exception as e:
 			print(e)
