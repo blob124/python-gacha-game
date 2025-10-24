@@ -11,51 +11,51 @@ from scenes.OptionPage import Settings
 pygame.init()
 
 class Game:
-	def __init__(self):
-		self.screen = pygame.display.set_mode((1067, 600))
+	def __init__(game):
+		game.screen = pygame.display.set_mode((1067, 600))
 		pygame.display.set_caption("Gacha Gambling")
-		self.clock = pygame.time.Clock()
+		game.clock = pygame.time.Clock()
 
-		self.loadData()
-		self.scenes = {	'GachaPlace':GachaPlace(self),
-						'Missions':Mission(self),
-						'TeamUp':Party(self),
-						'ArchivePage':Archive(self),
-						'OptionPage':Settings(self)}
+		game.loadData()
+		game.scenes = {	'GachaPlace':GachaPlace(game),
+						'Missions':Mission(game),
+						'TeamUp':Party(game),
+						'ArchivePage':Archive(game),
+						'OptionPage':Settings(game)}
 
 		pygame.mixer.init()
 		pygame.mixer.music.load(f'data/sfx/music.mp3')
 		pygame.mixer.music.set_volume(0.6)
 
-		self.change_scene(self.scenes['GachaPlace'])
+		game.change_scene(game.scenes['GachaPlace'])
 		pygame.mixer.music.play(-1)
 
-	def run(self):
-		self.running = True
-		while self.running:
-			self.mousepos = pygame.mouse.get_pos()
+	def run(game):
+		game.running = True
+		while game.running:
+			game.mousepos = pygame.mouse.get_pos()
 			events = pygame.event.get()
 			for event in events:
 				if event.type == pygame.QUIT:
-					self.running = False
+					game.running = False
 
-			self.scene.handle_events(events)
-			self.scene.update()
-			self.scene.draw(self.screen)
+			game.scene.handle_events(events)
+			game.scene.update()
+			game.scene.draw(game.screen)
 
 			pygame.display.flip()
-			self.clock.tick(60)
+			game.clock.tick(60)
 	
-	def loadData(self):
-		self.data = {}
-		self.char_obtained = {}
-		self.party = []
+	def loadData(game):
+		game.data = {}
+		game.char_obtained = {}
+		game.party = []
 
 		try:
 			with open('data/characterlist.txt','r') as charFile:
 				for line in charFile:
 					name,path_to_image,rarity,power = line.strip().split('_')
-					self.data[name] = Character(name,int(rarity),int(power),path_to_image)
+					game.data[name] = Character(name,int(rarity),int(power),path_to_image)
 		except:
 			print('character data file not found :sad:')
 			pygame.quit()
@@ -66,63 +66,63 @@ class Game:
 				_,obtain,party,currency = f.read().strip().split('[--]')
 				for char in obtain.strip().split():
 					name,dup = char.split('=') 
-					self.char_obtained[name] = int(dup)
+					game.char_obtained[name] = int(dup)
 
-				self.party = party.strip().split(',')
-				self.currency = currency.strip()
+				game.party = party.strip().split(',')
+				game.currency = currency.strip()
 				
 		except Exception as e:
 			print(e)
 			pygame.quit()
 			sys.exit()
 	
-	def saveData(self):
+	def saveData(game):
 		with open('data/profile.txt','w') as f:
 			towrite = []
-			for char,dup in self.char_obtained.items():
+			for char,dup in game.char_obtained.items():
 				towrite.append(f'{char}={dup}')
 			f.writelines('\n'.join(towrite))
 		
 		with open('data/currency.txt','w') as f:
-			f.writelines(f'{self.currency}')
+			f.writelines(f'{game.currency}')
 
-	def change_scene(self, new_scene):
-		self.scene = new_scene
+	def change_scene(game, new_scene):
+		game.scene = new_scene
 
 class Character:
-	def __init__(self, name, rarity, power, image_path):
-		self.name = name
-		self.rarity = rarity
-		self.power = power
+	def __init__(game, name, rarity, power, image_path):
+		game.name = name
+		game.rarity = rarity
+		game.power = power
 
-		self.imgpath = image_path
-		self.imgIcon = None
-		self.imgArt = None
+		game.imgpath = image_path
+		game.imgIcon = None
+		game.imgArt = None
 	
-	def getIcon(self):
-		if self.imgIcon is None:
+	def getIcon(game):
+		if game.imgIcon is None:
 			try:
-				icon = pygame.image.load(f'data/images/{self.imgpath}_icon.png').convert_alpha()
+				icon = pygame.image.load(f'data/images/{game.imgpath}_icon.png').convert_alpha()
 				icon = pygame.transform.scale(icon, (80, 80))
-				self.imgIcon = icon
+				game.imgIcon = icon
 			except:
 				icon = togoreIcon
 			return icon
 		else:
-			return self.imgIcon
+			return game.imgIcon
 	
-	def getArt(self):
-		if self.imgArt is None:
+	def getArt(game):
+		if game.imgArt is None:
 			try:
-				art = pygame.image.load(f'data/images/{self.imgpath}_art.png').convert_alpha()
+				art = pygame.image.load(f'data/images/{game.imgpath}_art.png').convert_alpha()
 				art = pygame.transform.scale(art, (400, 450))
-				self.imgArt = art
+				game.imgArt = art
 			except:
 				art = togoreArt
 				
 			return art
 		else:
-			return self.imgArt
+			return game.imgArt
 
 game = Game()
 togoreIcon = pygame.transform.scale(pygame.image.load('data/togore.bmp').convert_alpha(), (80, 80))

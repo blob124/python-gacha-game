@@ -7,33 +7,32 @@ FONT40 = pygame.font.SysFont(None, 40)
 EXITTXT = FONT24.render('Press Esc, it stands for Escape!', True, (255, 255, 255))
 
 class Settings:
-	def __init__(self,game):
-		self.game = game
-
-		self.textboxABC = TextBox(pygame.Rect(250,250,400,40),bgcolor=(255,255,255),text=None,textcolor=(0,0,0),textsize=24)
-		self.textboxABC.setText('Hi!')
-		self.textboxABC.haveBoarder = True
-		self.buttons = {}
 		self.buttons['buttonname'] = Button(None,pygame.Rect(200, 450, 100, 50),[(0,255,0),'TEXT HERE',(247,13,26),24],[(0,190,0),'HOVERING',None,None])
 		self.buttons['alsobuttonname'] = Button(None,pygame.Rect(400, 450, 100, 50),[(0,190,255),'TEXT HERE\n2',(247,13,26),24],[(0,144,190),'HOVERINGING',None,18])
+	def __init__(page,game):
+		page.game = game
+
+		page.textboxABC = TextBox(pygame.Rect(250,250,400,40),(255,255,255),(0,0,0),0,'defaultText',(0,0,0),24)
+
+		page.buttons = {}
 		
-	def handle_events(self, events):
+	def handle_events(page, events):
 		for event in events:
 			if event.type == pygame.KEYDOWN:
 				if event.key == pygame.K_RETURN:
 					pass
 				elif event.key == pygame.K_ESCAPE:
-						self.game.change_scene(self.game.scenes['GachaPlace'])
+						page.game.change_scene(page.game.scenes['GachaPlace'])
 			elif event.type == pygame.MOUSEBUTTONDOWN and event.button == 1: # detect mouseclick
-				if self.buttons['buttonname'].state == 1: # is Hover
+				if page.buttons['buttonname'].state == 1: # is Hover
 					pass
-				elif self.buttons['alsobuttonname'].state == 1:
+				elif page.buttons['alsobuttonname'].state == 1:
 					pass
 
 
-	def update(self):
-		for name,button in self.buttons.items():
-			button.checkHover(self.game.mousepos)		
+	def update(page):
+		for name,button in page.buttons.items():
+			button.checkHover(page.game.mousepos)		
 
 		if self.textboxABC.rect.collidepoint(self.game.mousepos):
 			self.textboxABC.haveBoarder = True
@@ -42,10 +41,10 @@ class Settings:
 
 		self.textboxABC.update()
 
-	def draw(self, screen):		
+	def draw(page, screen):		
 		screen.fill((30, 100, 160))
 		screen.blit(EXITTXT, (20, 20))
 
-		self.textboxABC.draw(screen)
-		for name,button in self.buttons.items():
+		page.textboxABC.draw(screen)
+		for name,button in page.buttons.items():
 			button.draw(screen)

@@ -1,3 +1,3 @@
 class Mission:
-	def __init__(self,game):
-		self.game = game
+	def __init__(page,game):
+		page.game = game
