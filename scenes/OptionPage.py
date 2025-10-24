@@ -7,14 +7,21 @@ FONT40 = pygame.font.SysFont(None, 40)
 EXITTXT = FONT24.render('Press Esc, it stands for Escape!', True, (255, 255, 255))
 
 class Settings:
-		self.buttons['buttonname'] = Button(None,pygame.Rect(200, 450, 100, 50),[(0,255,0),'TEXT HERE',(247,13,26),24],[(0,190,0),'HOVERING',None,None])
-		self.buttons['alsobuttonname'] = Button(None,pygame.Rect(400, 450, 100, 50),[(0,190,255),'TEXT HERE\n2',(247,13,26),24],[(0,144,190),'HOVERINGING',None,18])
 	def __init__(page,game):
 		page.game = game
 
 		page.textboxABC = TextBox(pygame.Rect(250,250,400,40),(255,255,255),(0,0,0),0,'defaultText',(0,0,0),24)
+		page.textboxABC.text['string'] = 'Hi pookie!!'
+		page.textboxABC.renderText()
+		page.textboxABC.updateSprite()
 
 		page.buttons = {}
+		buttonnameBox0 = TextBox(pygame.Rect(0,0,100,50),bgcolor=(0,255,0),text='TEXT HERE',textcolor=(247,13,26),textsize=24,aligncenter=True)
+		buttonnameBox1 = TextBox(pygame.Rect(0,0,100,50),bgcolor=(0,255,0),text='HOVERING',textcolor=(247,13,26),textsize=24,aligncenter=True)
+		page.buttons['buttonname'] = Interactable(200,450,[pygame.Rect(0,0,100,50),buttonnameBox0],[pygame.Rect(0,0,100,50),buttonnameBox1])
+		alsobuttonnameBox0 = TextBox(pygame.Rect(0,0,100,50),bgcolor=(0,190,255),text='TEXT HERE\n2',textcolor=(247,13,26),textsize=24,aligncenter=True)
+		alsobuttonnameBox1 = TextBox(pygame.Rect(0,0,100,50),bgcolor=(0,144,190),text='HOVERINGING',textcolor=(247,13,26),textsize=18,aligncenter=True)
+		page.buttons['alsobuttonname'] = Interactable(400,450,[pygame.Rect(0,0,100,50),alsobuttonnameBox0],[pygame.Rect(0,0,100,50),alsobuttonnameBox1])
 		
 	def handle_events(page, events):
 		for event in events:
@@ -34,12 +41,16 @@ class Settings:
 		for name,button in page.buttons.items():
 			button.checkHover(page.game.mousepos)		
 
-		if self.textboxABC.rect.collidepoint(self.game.mousepos):
-			self.textboxABC.haveBoarder = True
+		if page.textboxABC.rect.collidepoint(page.game.mousepos):
+			if page.textboxABC.box['boarderSize'] != 3:
+				page.textboxABC.box['boarderSize'] = 3
+				page.textboxABC.renderBox()
+				page.textboxABC.updateSprite()
 		else:
-			self.textboxABC.haveBoarder = False
-
-		self.textboxABC.update()
+			if page.textboxABC.box['boarderSize'] != 0:
+				page.textboxABC.box['boarderSize'] = 0
+				page.textboxABC.renderBox()
+				page.textboxABC.updateSprite()
 
 	def draw(page, screen):		
 		screen.fill((30, 100, 160))
