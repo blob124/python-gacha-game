@@ -5,43 +5,43 @@ pygame.init()
 EXITTXT = pygame.font.SysFont(None, 24).render('Press Esc, it stands for Escape!', True, (255, 255, 255))
 
 class Image(pygame.sprite.Sprite):
-	def __init__(self,image,x,y):
+	def __init__(self,image,topleft):
 		super().__init__()
-		self.image = image
-		self.imagegray = None
-		self.rect = self.image.get_rect(topleft=(x, y))
+		self.sprite = image
+		self.spriteButGray = None
+		self.rect = self.sprite.get_rect(topleft=topleft)
 		
 		#self.get_grayscale()
 
 	def get_grayscale(self):
-		if self.imagegray is None:
-			width,height = self.image.get_size()
-			self.imagegray = pygame.Surface((width, height))
-			pixelBG = self.image.get_at((0,0))[:3]
+		if self.spriteButGray is None:
+			width,height = self.sprite.get_size()
+			self.spriteButGray = pygame.Surface((width, height),flags=pygame.SRCALPHA)
+			pixelBG = self.sprite.get_at((0,0))[:3]
 			for x in range(width):
 				for y in range(height):
-					r,g,b,*_ = self.image.get_at((x,y))
+					r,g,b,*_ = self.sprite.get_at((x,y))
 					h,s,v = RGBtoHSV(r,g,b)
 					r0,g0,b0 = HSVtoRGB(0,0,v)
-					self.imagegray.set_at((x,y), (r0,g0,b0))
-		return self.imagegray
+					self.spriteButGray.set_at((x,y), (r0,g0,b0))
+		return self.spriteButGray
 	
 	def draw(self, screen, grayscale=False):
-		toblit = self.image if not grayscale else self.get_grayscale()
+		toblit = self.sprite if not grayscale else self.get_grayscale()
 		screen.blit(toblit, self.rect)
 
 class TextBox:
-	def __init__(self, rect, bgcolor=(0,0,0,0), boardcolor=(0,0,0,0), boardsize=0, text='', textcolor=(0,0,0), textsize=24, aligncenter=False):
+	def __init__(self, rect, bgcolor=(0,0,0,0), boardcolor=(0,0,0,0), boardsize=0, text='', textcolor=(0,0,0), textsize=24, aligncenter=False, antialias=True):
 		self.rect = rect
 		self.box = {'sprite':None,'bgColor':bgcolor,'boarderColor':boardcolor,'boarderSize':boardsize}
-		self.text = {'sprite':None,'string':text,'textColor':textcolor,'textSize':textsize,'font':pygame.font.SysFont(None, textsize)}
+		self.text = {'sprite':None,'string':text,'textColor':textcolor,'textSize':textsize,'font':pygame.font.SysFont(None, textsize),'antialias':antialias}
 		self.aligncenter = aligncenter
 
 		self.renderBox()
 		self.renderText()
 		self.updateSprite()
 
-	def renderBox(self):
+	def renderBox(self,update=False):
 		daBox = pygame.Surface(self.rect.size)
 		bgColor = self.box.get('bgColor')
 		bdColor = self.box.get('boarderColor')
@@ -53,13 +53,18 @@ class TextBox:
 			if bdSize > 0:
 				pygame.draw.rect(daBox,bdColor[:3],(0,0,self.rect.w,self.rect.h),bdSize)
 		self.box['sprite'] = daBox
+		if update:
+			self.updateSprite()
 	
-	def renderText(self):
+	def renderText(self,update=False):
 		textString = self.text.get('string')
 		textColor = self.text.get('textColor')
 		textSize = self.text.get('textSize')
 		textFont = self.text.get('font')
-		self.text['sprite'] = renderTextWithLines(textString,textColor,textSize,textFont)
+		antiAlias = self.text.get('antialias')
+		self.text['sprite'] = renderTextWithLines(textString,textColor,textSize,textFont,antiAlias)
+		if update:
+			self.updateSprite()
 	
 	def updateSprite(self):
 		self.sprite = pygame.Surface(self.rect.size)
@@ -76,9 +81,13 @@ class TextBox:
 		screen.blit(self.sprite, self.rect)
 
 class Interactable:
-	def __init__(self,x,y,*states):
-		self.x = x
-		self.y = y
+	def __init__(self,xy,*states): 
+		"""
+		xy: (x,y)\n
+		states: state0, state1, ...\n
+		state: [pygame.Rect(0,0,width,height), imageSurface]
+		"""
+		self.x, self.y = xy
 		self.state = 0
 		self.states = []
 		for state in states:
@@ -150,15 +159,16 @@ class Button: # outdated, dont use
 		toblit = self.state_list[self.state]
 		screen.blit(toblit, self.rect)
 
-def renderTextWithLines(text,textColor=(0,0,0),size=24,font=pygame.font.SysFont(None, 24),horizontal_align='Middle'):
+def renderTextWithLines(text,textColor=(0,0,0),size=24,font=pygame.font.SysFont(None, 24),anti_alias=True,horizontal_align='Middle'):
 	thefont = font
+	antialias = anti_alias
 	if '\n' not in text:
-		text_render = thefont.render(text,True,textColor)
+		text_render = thefont.render(text,antialias,textColor)
 		text_surface = text_render
 	else:
 		newlineOffY = size/8
 
-		text_render = {(x:=thefont.render(minitext,True,textColor)):(x.get_width(),x.get_height()) for minitext in text.split('\n')}
+		text_render = {(x:=thefont.render(minitext,antialias,textColor)):(x.get_width(),x.get_height()) for minitext in text.split('\n')}
 		text_render_width = max([w for w,_ in text_render.values()])
 		text_render_height = sum([h+newlineOffY for _,h in text_render.values()])-newlineOffY
 		text_surface = pygame.Surface(pygame.Rect(0,0,text_render_width,text_render_height).size,flags=pygame.SRCALPHA)
