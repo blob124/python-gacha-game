@@ -13,12 +13,45 @@ class GachaPlace:
 		page.status = 0 # 0:normal, 1:pull animation
 		page.justroll = []
 		page.buttons = {}
-		page.buttons['roll1'] = Button(None,pygame.Rect(200, 450, 100, 50),[(255,255,0),'roll1',(247,13,26),40],[(190,190,0),None,None,None])
-		page.buttons['goMission'] = Button(None,pygame.Rect(790, 25, 50, 50),[(255,255,0),'Quest',(247,13,26),18],[(190,190,0),None,None,None])
-		page.buttons['goParty'] = Button(None,pygame.Rect(855, 25, 50, 50),[(255,255,0),'Party',(247,13,26),18],[(190,190,0),None,None,None])
-		page.buttons['goArchive'] = Button(None,pygame.Rect(920, 25, 50, 50),[(255,255,0),'Archive',(247,13,26),18],[(190,190,0),None,None,None])
-		page.buttons['goOption'] = Button(None,pygame.Rect(985, 25, 50, 50),[(255,255,0),'Option',(247,13,26),18],[(190,190,0),None,None,None])
+		page.buttons['roll1'] = Interactable((200,450),
+			[pygame.Rect(0,0,100,50),
+				TextBox(pygame.Rect(0,0,100,50),bgcolor=(255,255,0,0),text='roll1',textcolor=(247,13,26),textsize=40,aligncenter=True)],
+			[pygame.Rect(0,0,100,50),
+				TextBox(pygame.Rect(0,0,100,50),bgcolor=(190,190,0,0),text='roll1',textcolor=(247,13,26),textsize=40,aligncenter=True)]
+		)
+		page.buttons['roll10'] = Interactable((769,450),
+			[pygame.Rect(0,0,100,50),
+				TextBox(pygame.Rect(0,0,100,50),bgcolor=(255,255,0,0),text='roll10',textcolor=(247,13,26),textsize=40,aligncenter=True)],
+			[pygame.Rect(0,0,100,50),
+				TextBox(pygame.Rect(0,0,100,50),bgcolor=(190,190,0,0),text='roll10',textcolor=(247,13,26),textsize=40,aligncenter=True)]
+		)
+
 		
+		page.buttons['goMission'] = Interactable((790,25),
+			[pygame.Rect(0,0,50,50),
+				TextBox(pygame.Rect(0,0,50,50),bgcolor=(255,255,0,0),text='Quest',textcolor=(247,13,26),textsize=18,aligncenter=True)],
+			[pygame.Rect(0,0,50,50),
+				TextBox(pygame.Rect(0,0,50,50),bgcolor=(190,190,0,0),text='Quest',textcolor=(247,13,26),textsize=18,aligncenter=True)]
+		)
+		page.buttons['goParty'] = Interactable((855,25),
+			[pygame.Rect(0,0,50,50),
+				TextBox(pygame.Rect(0,0,50,50),bgcolor=(255,255,0,0),text='Party',textcolor=(247,13,26),textsize=18,aligncenter=True)],
+			[pygame.Rect(0,0,50,50),
+				TextBox(pygame.Rect(0,0,50,50),bgcolor=(190,190,0,0),text='Party',textcolor=(247,13,26),textsize=18,aligncenter=True)]
+		)
+		page.buttons['goArchive'] = Interactable((920,25),
+			[pygame.Rect(0,0,50,50),
+				TextBox(pygame.Rect(0,0,50,50),bgcolor=(255,255,0,0),text='Archive',textcolor=(247,13,26),textsize=18,aligncenter=True)],
+			[pygame.Rect(0,0,50,50),
+				TextBox(pygame.Rect(0,0,50,50),bgcolor=(190,190,0,0),text='Archive',textcolor=(247,13,26),textsize=18,aligncenter=True)]
+		)
+		page.buttons['goOption'] = Interactable((985,25),
+			[pygame.Rect(0,0,50,50),
+				TextBox(pygame.Rect(0,0,50,50),bgcolor=(255,255,0,0),text='Option',textcolor=(247,13,26),textsize=18,aligncenter=True)],
+			[pygame.Rect(0,0,50,50),
+				TextBox(pygame.Rect(0,0,50,50),bgcolor=(190,190,0,0),text='Option',textcolor=(247,13,26),textsize=18,aligncenter=True)]
+		)
+
 	def handle_events(page, events):
 		for event in events:
 			if event.type == pygame.KEYDOWN:
@@ -27,6 +60,10 @@ class GachaPlace:
 			elif event.type == pygame.MOUSEBUTTONDOWN and event.button == 1: # detect mouseclick
 				if page.status == 0:
 					if page.buttons['roll1'].state == 1: # is Hover
+						page.roll(1)
+						page.status = 1
+					elif page.buttons['roll10'].state == 1:
+						page.roll(10)
 						page.status = 1
 					elif page.buttons['goMission'].state == 1:
 						page.game.change_scene(page.game.scenes['Missions'])
@@ -38,21 +75,23 @@ class GachaPlace:
 						page.game.change_scene(page.game.scenes['OptionPage'])
 				else:
 					page.status = 0
+					page.justroll = []
 
 	def update(page):
 		for name,button in page.buttons.items():
 			button.checkHover(page.game.mousepos)
 
 	def draw(page, screen):
-		screen.fill((130, 30, 30))
+		screen.fill((30, 100, 130))
 
 		for name,button in page.buttons.items():
 			button.draw(screen)
 
 		if page.status == 1:
-			xt = pygame.Surface(screen.get_size(), pygame.SRCALPHA)
-			xt.fill((0, 0, 0, 100))
-			screen.blit(xt,(0,0))
+			layer = pygame.Surface(screen.get_size(), pygame.SRCALPHA)
+			layer.fill((0, 0, 0, 100))
+			screen.blit(layer,(0,0))
+			page.showroll()
 
 	def roll(page,rolls=1):
 		pass

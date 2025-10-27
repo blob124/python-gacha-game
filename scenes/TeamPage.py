@@ -14,7 +14,7 @@ class Party:
 		char_0_icon = page.game.data['Man'].getIcon()
 
 		page.images = {}
-		page.images['image0'] = Image(char_0_icon,50,75)
+		page.images['image0'] = Image(char_0_icon,(50,75))
 		page.images['powerlevel'] = TextBox(pygame.Rect(80,520,300,50),(0,225,0),(0,0,0,0),0,'PowerLevel: 0',(255,190,190),32)
 
 
@@ -33,7 +33,7 @@ class Party:
 
 			theart = page.game.data[char].getArt()
 			theart = pygame.transform.scale_by(theart, (0.5, 0.5))
-			page.images[f'slot{i}'] = Image(theart,433+(i-2)*160,300)
+			page.images[f'slot{i}'] = Image(theart,(433+(i-2)*160,300))
 		
 		page.images['powerlevel'].text['string'] = f'PowerLevel: {sum([page.game.data[char].power for char in page.party])}'
 

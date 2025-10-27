@@ -7,52 +7,57 @@ FONT40 = pygame.font.SysFont(None, 40)
 EXITTXT = FONT24.render('Press Esc, it stands for Escape!', True, (255, 255, 255))
 
 class Archive:
-	def __init__(self,game):
-		self.game = game
+	def __init__(page,game):
+		page.game = game
 
-		self.images = {}
-		char_0_icon = self.game.data['Man'].getIcon()
-		char_0_art = self.game.data['Man'].getArt()
+		page.images = {}
+		char_0_icon = page.game.data['Man'].getIcon()
+		char_0_art = page.game.data['Man'].getArt()
 		
-		one_image = pygame.image.load('data/images/numba1.png').convert_alpha()
+		one_image = pygame.image.load('data/numba1.png').convert_alpha()
 		one_image = pygame.transform.scale_by(one_image, (2, 0.2))
 
-		self.images['image0'] = Image(char_0_icon,50,75)
-		self.images['image1'] = Image(char_0_art,650,75)
-		self.images['one'] = Image(one_image,150,200)
+		page.images['image0'] = Image(char_0_icon,(50,75))
+		page.images['image1'] = Image(char_0_art,(650,75))
+		page.images['one'] = Image(one_image,(150,200))
 
-		self.buttons = {}
-		self.buttons['buttonname'] = Button(None,pygame.Rect(200, 450, 100, 50),[(0,255,0),'TEXT HERE',(247,13,26),24],[(0,190,0),None,None,None])
-		self.buttons['alsobuttonname'] = Button(None,pygame.Rect(400, 450, 100, 50),[(0,190,255),'TEXT HERE\n2',(247,13,26),24],[(0,144,190),'HOVERINGING',None,18])
-		
-	def handle_events(self, events):
+		page.buttons = {}
+		page.buttons['buttonname'] = Interactable((200,450),
+			[pygame.Rect(0,0,100,50),
+				TextBox(pygame.Rect(0,0,100,50),bgcolor=(0,255,0),text='TEXT HERE',textcolor=(247,13,26),textsize=24,aligncenter=True)],
+			[pygame.Rect(0,0,100,50),
+				TextBox(pygame.Rect(0,0,100,50),bgcolor=(0,255,0),text='HOVERING',textcolor=(247,13,26),textsize=24,aligncenter=True)])
+		page.buttons['alsobuttonname'] = Interactable((400,450),
+			[pygame.Rect(0,0,100,50),
+				TextBox(pygame.Rect(0,0,100,50),bgcolor=(0,190,255),text='TEXT HERE\n2',textcolor=(247,13,26),textsize=24,aligncenter=True)],
+			[pygame.Rect(0,0,100,50),
+				TextBox(pygame.Rect(0,0,100,50),bgcolor=(0,144,190),text='HOVERINGING',textcolor=(247,13,26),textsize=18,aligncenter=True)])
+
+	def handle_events(page, events):
 		for event in events:
 			if event.type == pygame.KEYDOWN:
 				if event.key == pygame.K_RETURN:
 					pass
 				elif event.key == pygame.K_ESCAPE:
-						self.game.change_scene(self.game.scenes['GachaPlace'])
+						page.game.change_scene(page.game.scenes['GachaPlace'])
 			elif event.type == pygame.MOUSEBUTTONDOWN and event.button == 1: # detect mouseclick
-				if self.buttons['buttonname'].state == 1: # is Hover
+				if page.buttons['buttonname'].state == 1: # is Hover
 					pass
-				elif self.buttons['alsobuttonname'].state == 1:
+				elif page.buttons['alsobuttonname'].state == 1:
 					pass
 
-	def update(self):
-		for name,button in self.buttons.items():
-			button.checkHover(self.game.mousepos)
+	def update(page):
+		for name,button in page.buttons.items():
+			button.checkHover(page.game.mousepos)
 
-	def draw(self, screen):		
+	def draw(page, screen):		
 		screen.fill((30, 100, 30))
 		screen.blit(EXITTXT, (20, 20))
 
-		for id,image in self.images.items():
-			if id=='togore0':
-				image.draw(screen,grayscale=True)
-			else:
-				image.draw(screen)
+		for id,image in page.images.items():
+			image.draw(screen,grayscale=False)
 
-		for name,button in self.buttons.items():
+		for name,button in page.buttons.items():
 			button.draw(screen)
 		
 		pygame.draw.line(screen, (255,255,255), (650,80), (650,520), 1)

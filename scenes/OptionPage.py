@@ -12,17 +12,20 @@ class Settings:
 
 		page.textboxABC = TextBox(pygame.Rect(250,250,400,40),(255,255,255),(0,0,0),0,'defaultText',(0,0,0),24)
 		page.textboxABC.text['string'] = 'Hi pookie!!'
-		page.textboxABC.renderText()
-		page.textboxABC.updateSprite()
+		page.textboxABC.renderText(True)
 
 		page.buttons = {}
-		buttonnameBox0 = TextBox(pygame.Rect(0,0,100,50),bgcolor=(0,255,0),text='TEXT HERE',textcolor=(247,13,26),textsize=24,aligncenter=True)
-		buttonnameBox1 = TextBox(pygame.Rect(0,0,100,50),bgcolor=(0,255,0),text='HOVERING',textcolor=(247,13,26),textsize=24,aligncenter=True)
-		page.buttons['buttonname'] = Interactable(200,450,[pygame.Rect(0,0,100,50),buttonnameBox0],[pygame.Rect(0,0,100,50),buttonnameBox1])
-		alsobuttonnameBox0 = TextBox(pygame.Rect(0,0,100,50),bgcolor=(0,190,255),text='TEXT HERE\n2',textcolor=(247,13,26),textsize=24,aligncenter=True)
-		alsobuttonnameBox1 = TextBox(pygame.Rect(0,0,100,50),bgcolor=(0,144,190),text='HOVERINGING',textcolor=(247,13,26),textsize=18,aligncenter=True)
-		page.buttons['alsobuttonname'] = Interactable(400,450,[pygame.Rect(0,0,100,50),alsobuttonnameBox0],[pygame.Rect(0,0,100,50),alsobuttonnameBox1])
-		
+		page.buttons['buttonname'] = Interactable((200,450),
+			[pygame.Rect(0,0,100,50),
+				TextBox(pygame.Rect(0,0,100,50),bgcolor=(0,255,0),text='TEXT HERE',textcolor=(247,13,26),textsize=24,aligncenter=True)],
+			[pygame.Rect(0,0,100,50),
+				TextBox(pygame.Rect(0,0,100,50),bgcolor=(0,255,0),text='HOVERING',textcolor=(247,13,26),textsize=24,aligncenter=True)])
+		page.buttons['alsobuttonname'] = Interactable((400,450),
+			[pygame.Rect(0,0,100,50),
+				TextBox(pygame.Rect(0,0,100,50),bgcolor=(0,190,255),text='TEXT HERE\n2',textcolor=(247,13,26),textsize=24,aligncenter=True)],
+			[pygame.Rect(0,0,100,50),
+				TextBox(pygame.Rect(0,0,100,50),bgcolor=(0,144,190),text='HOVERINGING',textcolor=(247,13,26),textsize=18,aligncenter=True)])
+
 	def handle_events(page, events):
 		for event in events:
 			if event.type == pygame.KEYDOWN:
@@ -44,16 +47,14 @@ class Settings:
 		if page.textboxABC.rect.collidepoint(page.game.mousepos):
 			if page.textboxABC.box['boarderSize'] != 3:
 				page.textboxABC.box['boarderSize'] = 3
-				page.textboxABC.renderBox()
-				page.textboxABC.updateSprite()
+				page.textboxABC.renderBox(True)
 		else:
 			if page.textboxABC.box['boarderSize'] != 0:
 				page.textboxABC.box['boarderSize'] = 0
-				page.textboxABC.renderBox()
-				page.textboxABC.updateSprite()
+				page.textboxABC.renderBox(True)
 
 	def draw(page, screen):		
-		screen.fill((30, 100, 160))
+		screen.fill((100, 100, 100))
 		screen.blit(EXITTXT, (20, 20))
 
 		page.textboxABC.draw(screen)
