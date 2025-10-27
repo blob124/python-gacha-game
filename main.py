@@ -32,19 +32,25 @@ class Game:
 
 	def run(game):
 		game.running = True
-		while game.running:
-			game.mousepos = pygame.mouse.get_pos()
-			events = pygame.event.get()
-			for event in events:
-				if event.type == pygame.QUIT:
-					game.running = False
+		try:
+			while game.running:
+				game.mousepos = pygame.mouse.get_pos()
+				events = pygame.event.get()
+				for event in events:
+					if event.type == pygame.QUIT:
+						game.saveData()
+						game.running = False
 
-			game.scene.handle_events(events)
-			game.scene.update()
-			game.scene.draw(game.screen)
+				game.scene.handle_events(events)
+				game.scene.update()
+				game.scene.draw(game.screen)
 
-			pygame.display.flip()
-			game.clock.tick(60)
+				pygame.display.flip()
+				game.clock.tick(60)
+		except Exception as e:
+			game.saveData()
+			print(e)
+			
 	
 	def loadData(game):
 		game.data = {}
@@ -66,7 +72,7 @@ class Game:
 				_,obtain,party,currency = f.read().strip().split('[--]')
 				for char in obtain.strip().split():
 					name,dup = char.split('=') 
-					game.char_obtained[name] = int(dup)
+					game.increase_char_obtain(name,int(dup))
 
 				game.party = party.strip().split(',')
 				game.currency = currency.strip()
@@ -78,13 +84,16 @@ class Game:
 	
 	def saveData(game):
 		with open('data/profile.txt','w') as f:
-			towrite = []
-			for char,dup in game.char_obtained.items():
-				towrite.append(f'{char}={dup}')
-			f.writelines('\n'.join(towrite))
-		
-		with open('data/currency.txt','w') as f:
-			f.writelines(f'{game.currency}')
+			obtain = '\n'.join([f'{char}={dup}' for char,dup in game.char_obtained.items()])
+			party = ','.join(game.party)
+			currency = game.currency
+			f.writelines(f'[--]\n{obtain}\n[--]\n{party}\n[--]\n{currency}')
+	
+	def increase_char_obtain(game,name,amount=1):
+		if name not in game.char_obtained:
+			game.char_obtained[name] = amount
+		else:
+			game.char_obtained[name] += amount
 
 	def change_scene(game, new_scene):
 		game.scene = new_scene
