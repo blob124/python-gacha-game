@@ -11,7 +11,7 @@ class Archive:
 		page.game = game
 
 		page.images = {}
-		char_0_icon = page.game.data['Man'].getIcon()
+		char_0_icon = page.game.data['Man'].getIcon(bg=True)
 		char_0_art = page.game.data['Man'].getArt()
 		
 		one_image = pygame.image.load('data/numba1.png').convert_alpha()
@@ -22,16 +22,14 @@ class Archive:
 		page.images['one'] = Image(one_image,(150,200))
 
 		page.buttons = {}
-		page.buttons['buttonname'] = Interactable((200,450),
-			[pygame.Rect(0,0,100,50),
-				TextBox(pygame.Rect(0,0,100,50),bgcolor=(0,255,0),text='TEXT HERE',textcolor=(247,13,26),textsize=24,aligncenter=True)],
-			[pygame.Rect(0,0,100,50),
-				TextBox(pygame.Rect(0,0,100,50),bgcolor=(0,255,0),text='HOVERING',textcolor=(247,13,26),textsize=24,aligncenter=True)])
-		page.buttons['alsobuttonname'] = Interactable((400,450),
-			[pygame.Rect(0,0,100,50),
-				TextBox(pygame.Rect(0,0,100,50),bgcolor=(0,190,255),text='TEXT HERE\n2',textcolor=(247,13,26),textsize=24,aligncenter=True)],
-			[pygame.Rect(0,0,100,50),
-				TextBox(pygame.Rect(0,0,100,50),bgcolor=(0,144,190),text='HOVERINGING',textcolor=(247,13,26),textsize=18,aligncenter=True)])
+		page.buttons['buttonname'] = SimpleButton(pygame.Rect(200,450,100,50),
+			[TextBox(pygame.Rect(0,0,100,50),bgcolor=(0,255,0),text='TEXT HERE',textcolor=(247,13,26),aligncenter=True)],
+			[TextBox(pygame.Rect(0,0,100,50),bgcolor=(0,255,0),text='HOVERING',textcolor=(247,13,26),aligncenter=True)]
+		)
+
+		page.buttons['alsobuttonname'] = SimpleButton(pygame.Rect(400,450,100,50),
+			[TextBox(pygame.Rect(0,0,100,50),bgcolor=(0,190,255),text='TEXT HERE\n2',textcolor=(247,13,26),aligncenter=True)],
+			[TextBox(pygame.Rect(0,0,100,50),bgcolor=(0,144,190),text='HOVERINGING',textcolor=(247,13,26),textsize=18,aligncenter=True)])
 
 	def handle_events(page, events):
 		for event in events:
@@ -50,14 +48,14 @@ class Archive:
 		for name,button in page.buttons.items():
 			button.checkHover(page.game.mousepos)
 
-	def draw(page, screen):		
-		screen.fill((30, 100, 30))
-		screen.blit(EXITTXT, (20, 20))
+	def draw(page):
+		page.game.screen.fill((30, 100, 30))
+		page.game.screen.blit(EXITTXT, (20, 20))
 
 		for id,image in page.images.items():
-			image.draw(screen,grayscale=False)
+			image.draw(page.game.screen,grayscale=False)
 
 		for name,button in page.buttons.items():
-			button.draw(screen)
+			button.draw(page.game.screen)
 		
-		pygame.draw.line(screen, (255,255,255), (650,80), (650,520), 1)
+		pygame.draw.line(page.game.screen, (255,255,255), (650,80), (650,520), 1)

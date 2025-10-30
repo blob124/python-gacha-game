@@ -15,12 +15,14 @@ class Party:
 
 		page.images = {}
 		page.images['image0'] = Image(char_0_icon,(50,75))
-		page.images['powerlevel'] = TextBox(pygame.Rect(80,520,300,50),(0,225,0),(0,0,0,0),0,'PowerLevel: 0',(255,190,190),32)
 
+		page.images['powerlevel'] = TextBox(pygame.Rect(80,520,300,50),bgcolor=(0,225,0),text='PowerLevel: 0',textcolor=(255,190,190),textsize=32)
 
 		page.buttons = {}
-		page.buttons['buttonname'] = Button(None,pygame.Rect(950, 520, 80, 40),[(0,255,0),'TEXT HERE',(247,13,26),20],[(0,190,0),None,None,None])
-
+		page.buttons['buttonname'] = SimpleButton(pygame.Rect(950,520,80,40),
+			[TextBox(pygame.Rect(0,0,80,40),(0,255,0),text='TEXT HERE',textcolor=(247,13,26),textsize=20)],
+			[TextBox(pygame.Rect(0,0,80,40),(0,190,0),text='TEXT HERE',textcolor=(247,13,26),textsize=20)]
+		)
 
 		page.updateParty()
 
@@ -52,14 +54,14 @@ class Party:
 		for name,button in page.buttons.items():
 			button.checkHover(page.game.mousepos)
 
-	def draw(page, screen):		
-		screen.fill((30, 30, 160))
-		screen.blit(EXITTXT, (20, 20))
+	def draw(page):
+		page.game.screen.fill((30, 30, 160))
+		page.game.screen.blit(EXITTXT, (20, 20))
 
 		for id,image in page.images.items():
-			image.draw(screen)
+			image.draw(page.game.screen)
 
 		for name,button in page.buttons.items():
-			button.draw(screen)
+			button.draw(page.game.screen)
 		
-		pygame.draw.line(screen, (255,255,255), (50,280), (1067-50,280), 1)
+		pygame.draw.line(page.game.screen, (255,255,255), (50,280), (1067-50,280), 1)

@@ -21,6 +21,6 @@ class Mission:
 	def update(page):
 		pass
 
-	def draw(page, screen):		
-		screen.fill((160, 100, 30))
-		screen.blit(EXITTXT, (20, 20))
+	def draw(page):		
+		page.game.screen.fill((160, 100, 30))
+		page.game.screen.blit(EXITTXT, (20, 20))

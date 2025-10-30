@@ -31,7 +31,7 @@ class Image(pygame.sprite.Sprite):
 		screen.blit(toblit, self.rect)
 
 class TextBox:
-	def __init__(self, rect, bgcolor=(0,0,0,0), boardcolor=(0,0,0,0), boardsize=0, text='', textcolor=(0,0,0), textsize=24, aligncenter=False, antialias=True):
+	def __init__(self, rect, bgcolor=(0,0,0,0), boardcolor=(0,0,0), boardsize=0, text='', textsize=24, textcolor=(0,0,0), aligncenter=False, antialias=True):
 		self.rect = rect
 		self.box = {'sprite':None,'bgColor':bgcolor,'boarderColor':boardcolor,'boarderSize':boardsize}
 		self.text = {'sprite':None,'string':text,'textColor':textcolor,'textSize':textsize,'font':pygame.font.SysFont(None, textsize),'antialias':antialias}
@@ -42,9 +42,9 @@ class TextBox:
 		self.updateSprite()
 
 	def renderBox(self,update=False):
-		daBox = pygame.Surface(self.rect.size)
-		bgColor = self.box.get('bgColor')
-		bdColor = self.box.get('boarderColor')
+		daBox = pygame.Surface(self.rect.size, flags=pygame.SRCALPHA)
+		bgColor = (list(self.box.get('bgColor'))+[255])[:4]
+		bdColor = (list(self.box.get('boarderColor'))+[255])[:4]
 		bdSize = self.box.get('boarderSize')
 		if bdSize >= min(self.rect.size):
 			daBox.fill(bdColor)
@@ -67,7 +67,7 @@ class TextBox:
 			self.updateSprite()
 	
 	def updateSprite(self):
-		self.sprite = pygame.Surface(self.rect.size)
+		self.sprite = pygame.Surface(self.rect.size, flags=pygame.SRCALPHA)
 		sprBox = self.box.get('sprite')
 		sprText = self.text.get('sprite')
 		self.sprite.blit(sprBox,(0,0))
@@ -81,7 +81,7 @@ class TextBox:
 		screen.blit(self.sprite, self.rect)
 
 class Interactable:
-	def __init__(self,xy,*states): 
+	def __init__(self,xy,*states):
 		"""
 		xy: (x,y)\n
 		states: state0, state1, ...\n
@@ -110,54 +110,14 @@ class Interactable:
 	def draw(self,screen):
 		screen.blit(self.curState().get('sprite').sprite, (self.x,self.y))
 
-class Button: # outdated, dont use
-	def __init__(self,sprite,rect,*states):
-		self.rect = rect
-		self.state = 0
-		self.state_list = []
-		if sprite is not None:
-			self.state_list.append(sprite)
-			dark_overlay = pygame.Surface(self.sprite.get_size(), flags=pygame.SRCALPHA)
-			dark_overlay.fill((0,0,0,100))
-			hsprite = sprite
-			hsprite.blit(dark_overlay(0,0))
-			self.state_list.append(hsprite)
-		else:
-			df_bgColor = states[0][0]
-			df_text = states[0][1]
-			df_textColor = states[0][2]
-			df_textSize = states[0][3]
-
-			for state in states:
-				bgColor, text, textColor, textSize = state
-				if bgColor is None:
-					bgColor = df_bgColor
-				if text is None:
-					text = df_text
-				if textColor is None:
-					textColor = df_textColor
-				if textSize is None:
-					textSize = df_textSize
-				
-				sf = pygame.Surface(self.rect.size)
-				sf.fill(bgColor)
-				if text != '':
-					text_render = renderTextWithLines(text,textColor,textSize,pygame.font.SysFont(None, textSize))
-					sf.blit(text_render, (sf.get_width()/2-text_render.get_width()/2, sf.get_height()/2-text_render.get_height()/2))
-		
-				self.state_list.append(sf)
-	
-	def checkHover(self,mousepos):
-		if self.rect.collidepoint(mousepos):
-			self.state = 1
-		else:
-			self.state = 0
-	
-	def draw(self,screen):
-		if self.state>len(self.state_list)-1:
-			self.state = 0
-		toblit = self.state_list[self.state]
-		screen.blit(toblit, self.rect)
+class SimpleButton(Interactable):
+	def __init__(self,rect,*sprites):
+		"""
+		rect: pygame.Rect(x,y,width,height)\n
+		sprites: state0, state1, ...\n
+		sprite: [imageSurface]
+		"""
+		super().__init__(rect.topleft,*[[pygame.Rect(0,0,rect.w,rect.h),*sprite] for sprite in sprites])
 
 def renderTextWithLines(text,textColor=(0,0,0),size=24,font=pygame.font.SysFont(None, 24),anti_alias=True,horizontal_align='Middle'):
 	thefont = font

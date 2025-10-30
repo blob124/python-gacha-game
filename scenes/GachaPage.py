@@ -13,43 +13,31 @@ class GachaPlace:
 		page.status = 0 # 0:normal, 1:pull animation
 		page.justroll = []
 		page.buttons = {}
-		page.buttons['roll1'] = Interactable((200,450),
-			[pygame.Rect(0,0,100,50),
-				TextBox(pygame.Rect(0,0,100,50),bgcolor=(255,255,0,0),text='roll1',textcolor=(247,13,26),textsize=40,aligncenter=True)],
-			[pygame.Rect(0,0,100,50),
-				TextBox(pygame.Rect(0,0,100,50),bgcolor=(190,190,0,0),text='roll1',textcolor=(247,13,26),textsize=40,aligncenter=True)]
+		page.buttons['roll1'] = SimpleButton(pygame.Rect(200,450,100,50),
+				[TextBox(pygame.Rect(0,0,100,50),bgcolor=(255,255,0,255),text='roll1',textcolor=(247,13,26),textsize=40,aligncenter=True)],
+				[TextBox(pygame.Rect(0,0,100,50),bgcolor=(190,190,0,255),text='roll1',textcolor=(247,13,26),textsize=40,aligncenter=True)]
 		)
-		page.buttons['roll10'] = Interactable((769,450),
-			[pygame.Rect(0,0,100,50),
-				TextBox(pygame.Rect(0,0,100,50),bgcolor=(255,255,0,0),text='roll10',textcolor=(247,13,26),textsize=40,aligncenter=True)],
-			[pygame.Rect(0,0,100,50),
-				TextBox(pygame.Rect(0,0,100,50),bgcolor=(190,190,0,0),text='roll10',textcolor=(247,13,26),textsize=40,aligncenter=True)]
+		page.buttons['roll10'] = SimpleButton(pygame.Rect(769,450,100,50),
+				[TextBox(pygame.Rect(0,0,100,50),bgcolor=(255,255,0,255),text='roll10',textcolor=(247,13,26),textsize=40,aligncenter=True)],
+				[TextBox(pygame.Rect(0,0,100,50),bgcolor=(190,190,0,255),text='roll10',textcolor=(247,13,26),textsize=40,aligncenter=True)]
 		)
 
 		
-		page.buttons['goMission'] = Interactable((790,25),
-			[pygame.Rect(0,0,50,50),
-				TextBox(pygame.Rect(0,0,50,50),bgcolor=(255,255,0,0),text='Quest',textcolor=(247,13,26),textsize=18,aligncenter=True)],
-			[pygame.Rect(0,0,50,50),
-				TextBox(pygame.Rect(0,0,50,50),bgcolor=(190,190,0,0),text='Quest',textcolor=(247,13,26),textsize=18,aligncenter=True)]
+		page.buttons['goMission'] = SimpleButton(pygame.Rect(790,25,50,50),
+				[TextBox(pygame.Rect(0,0,50,50),bgcolor=(255,255,0,255),text='Quest',textcolor=(247,13,26),textsize=18,aligncenter=True)],
+				[TextBox(pygame.Rect(0,0,50,50),bgcolor=(190,190,0,255),text='Quest',textcolor=(247,13,26),textsize=18,aligncenter=True)]
 		)
-		page.buttons['goParty'] = Interactable((855,25),
-			[pygame.Rect(0,0,50,50),
-				TextBox(pygame.Rect(0,0,50,50),bgcolor=(255,255,0,0),text='Party',textcolor=(247,13,26),textsize=18,aligncenter=True)],
-			[pygame.Rect(0,0,50,50),
-				TextBox(pygame.Rect(0,0,50,50),bgcolor=(190,190,0,0),text='Party',textcolor=(247,13,26),textsize=18,aligncenter=True)]
+		page.buttons['goParty'] = SimpleButton(pygame.Rect(855,25,50,50),
+				[TextBox(pygame.Rect(0,0,50,50),bgcolor=(255,255,0,255),text='Party',textcolor=(247,13,26),textsize=18,aligncenter=True)],
+				[TextBox(pygame.Rect(0,0,50,50),bgcolor=(190,190,0,255),text='Party',textcolor=(247,13,26),textsize=18,aligncenter=True)]
 		)
-		page.buttons['goArchive'] = Interactable((920,25),
-			[pygame.Rect(0,0,50,50),
-				TextBox(pygame.Rect(0,0,50,50),bgcolor=(255,255,0,0),text='Archive',textcolor=(247,13,26),textsize=18,aligncenter=True)],
-			[pygame.Rect(0,0,50,50),
-				TextBox(pygame.Rect(0,0,50,50),bgcolor=(190,190,0,0),text='Archive',textcolor=(247,13,26),textsize=18,aligncenter=True)]
+		page.buttons['goArchive'] = SimpleButton(pygame.Rect(920,25,50,50),
+				[TextBox(pygame.Rect(0,0,50,50),bgcolor=(255,255,0,255),text='Archive',textcolor=(247,13,26),textsize=18,aligncenter=True)],
+				[TextBox(pygame.Rect(0,0,50,50),bgcolor=(190,190,0,255),text='Archive',textcolor=(247,13,26),textsize=18,aligncenter=True)]
 		)
-		page.buttons['goOption'] = Interactable((985,25),
-			[pygame.Rect(0,0,50,50),
-				TextBox(pygame.Rect(0,0,50,50),bgcolor=(255,255,0,0),text='Option',textcolor=(247,13,26),textsize=18,aligncenter=True)],
-			[pygame.Rect(0,0,50,50),
-				TextBox(pygame.Rect(0,0,50,50),bgcolor=(190,190,0,0),text='Option',textcolor=(247,13,26),textsize=18,aligncenter=True)]
+		page.buttons['goOption'] = SimpleButton(pygame.Rect(985,25,50,50),
+				[TextBox(pygame.Rect(0,0,50,50),bgcolor=(255,255,0,255),text='Option',textcolor=(247,13,26),textsize=18,aligncenter=True)],
+				[TextBox(pygame.Rect(0,0,50,50),bgcolor=(190,190,0,255),text='Option',textcolor=(247,13,26),textsize=18,aligncenter=True)]
 		)
 
 	def handle_events(page, events):
@@ -81,11 +69,11 @@ class GachaPlace:
 		for name,button in page.buttons.items():
 			button.checkHover(page.game.mousepos)
 
-	def draw(page, screen):
 		screen.fill((30, 100, 130))
+	def draw(page):
 
 		for name,button in page.buttons.items():
-			button.draw(screen)
+			button.draw(page.game.screen)
 
 		if page.status == 1:
 			layer = pygame.Surface(screen.get_size(), pygame.SRCALPHA)

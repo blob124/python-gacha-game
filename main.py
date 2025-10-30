@@ -25,7 +25,7 @@ class Game:
 
 		pygame.mixer.init()
 		pygame.mixer.music.load(f'data/sfx/music.mp3')
-		pygame.mixer.music.set_volume(0.6)
+		pygame.mixer.music.set_volume(0.4)
 
 		game.change_scene(game.scenes['GachaPlace'])
 		pygame.mixer.music.play(-1)
@@ -43,7 +43,7 @@ class Game:
 
 				game.scene.handle_events(events)
 				game.scene.update()
-				game.scene.draw(game.screen)
+				game.scene.draw()
 
 				pygame.display.flip()
 				game.clock.tick(60)
@@ -98,40 +98,46 @@ class Game:
 	def change_scene(game, new_scene):
 		game.scene = new_scene
 
+RANK_COLOR = [(124,142,161),(100,156,128),(91,150,186),(160,119,201),(204,152,88)]
 class Character:
-	def __init__(game, name, rarity, power, image_path):
-		game.name = name
-		game.rarity = rarity
-		game.power = power
+	def __init__(self, name, rarity, power, image_path):
+		self.name = name
+		self.rarity = rarity
+		self.power = power
 
-		game.imgpath = image_path
-		game.imgIcon = None
-		game.imgArt = None
+		self.imgpath = image_path
+		self.imgIcon = None
+		self.imgArt = None
 	
-	def getIcon(game):
-		if game.imgIcon is None:
+	def getIcon(self,bg=False):
+		icon = self.imgIcon
+		if icon is None:
 			try:
-				icon = pygame.image.load(f'data/images/{game.imgpath}_icon.png').convert_alpha()
+				icon = pygame.image.load(f'data/images/{self.imgpath}_icon.png').convert_alpha()
 				icon = pygame.transform.scale(icon, (80, 80))
-				game.imgIcon = icon
+				self.imgIcon = icon
 			except:
 				icon = togoreIcon
+
+		if not bg:
 			return icon
 		else:
-			return game.imgIcon
-	
-	def getArt(game):
-		if game.imgArt is None:
+			sf = pygame.Surface((80,80))
+			sf.fill(RANK_COLOR[self.rarity-1])
+			sf.blit(icon,(0,0))
+			return sf
+
+	def getArt(self):
+		art = self.imgArt
+		if art is None:
 			try:
-				art = pygame.image.load(f'data/images/{game.imgpath}_art.png').convert_alpha()
+				art = pygame.image.load(f'data/images/{self.imgpath}_art.png').convert_alpha()
 				art = pygame.transform.scale(art, (400, 450))
-				game.imgArt = art
+				self.imgArt = art
 			except:
 				art = togoreArt
 				
-			return art
-		else:
-			return game.imgArt
+		return art
 
 game = Game()
 togoreIcon = pygame.transform.scale(pygame.image.load('data/togore.bmp').convert_alpha(), (80, 80))
