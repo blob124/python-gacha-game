@@ -114,11 +114,11 @@ class Character:
 	def getIcon(self,bg=False):
 		icon = self.imgIcon
 		if icon is None:
-			if Path(f'data/images/{self.imgpath}_icon.png').is_file():
-				icon = pygame.transform.scale(pygame.image.load(f'data/images/{self.imgpath}_icon.png').convert_alpha(), (80, 80))
+			if Path(f'data/images/characters/{self.imgpath}_icon.png').is_file():
+				icon = pygame.transform.scale(pygame.image.load(f'data/images/characters/{self.imgpath}_icon.png').convert_alpha(), (80, 80))
 				self.imgIcon = icon
 			else:
-				icon = pygame.transform.scale(pygame.image.load(f'data/images/placeholder_icon.png').convert_alpha(), (80, 80))
+				icon = pygame.transform.scale(pygame.image.load(f'data/images/characters/placeholder_icon.png').convert_alpha(), (80, 80))
 
 		if not bg:
 			return icon
@@ -131,11 +131,11 @@ class Character:
 	def getArt(self):
 		art = self.imgArt
 		if art is None:
-			if Path(f'data/images/{self.imgpath}_art.png').is_file():
-				art = pygame.transform.scale(pygame.image.load(f'data/images/{self.imgpath}_art.png').convert_alpha(), (400, 450))
+			if Path(f'data/images/characters/{self.imgpath}_art.png').is_file():
+				art = pygame.transform.scale(pygame.image.load(f'data/images/characters/{self.imgpath}_art.png').convert_alpha(), (400, 450))
 				self.imgArt = art
 			else:
-				art = pygame.transform.scale(pygame.image.load(f'data/images/placeholder_art.png').convert_alpha(), (400, 450))
+				art = pygame.transform.scale(pygame.image.load(f'data/images/characters/placeholder_art.png').convert_alpha(), (400, 450))
 				
 		return art
 
