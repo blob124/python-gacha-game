@@ -1,20 +1,27 @@
 import pygame
-import random
 from stuff import *
 
-FONT24 = pygame.font.SysFont(None, 24)
-FONT40 = pygame.font.SysFont(None, 40)
-EXITTXT = FONT24.render('Press Esc, it stands for Escape!', True, (255, 255, 255))
+EXITTXT = pygame.font.SysFont(None, 24).render('Press Esc, it stands for Escape!', True, (255, 255, 255))
 
-class Settings:
+class Settings(Scene):
 	def __init__(page,game):
 		page.game = game
 
-		page.textboxABC = TextBox(pygame.Rect(250,250,400,40),bgcolor=(255,255,255),text='defaultText')
-		page.textboxABC.text['string'] = 'Hi pookie!!'
-		page.textboxABC.renderText(True)
+		page.bg = pygame.Surface(page.game.screen.get_size())
+		page.bg.fill((100,100,100))
+		page.bg.blit(EXITTXT,(20,20))
 
+		page.images = {}
+		page.textbox = {}
 		page.buttons = {}
+		page.groups = {	0:page.images,
+				 		1:page.textbox,
+				 		2:page.buttons}
+
+		page.textbox['textboxABC'] = TextBox(pygame.Rect(250,250,400,40),bgcolor=(255,255,255),text='defaultText')
+		page.textbox['textboxABC'].text['string'] = 'Hi pookie!!'
+		page.textbox['textboxABC'].renderText(True)
+
 		page.buttons['buttonname'] = SimpleButton(pygame.Rect(200,450,100,50),
 			[TextBox(pygame.Rect(0,0,100,50),bgcolor=(0,255,0),text='TEXT HERE',textcolor=(247,13,26),aligncenter=True)],
 			[TextBox(pygame.Rect(0,0,100,50),bgcolor=(0,255,0),text='HOVERING',textcolor=(247,13,26),aligncenter=True)]
@@ -39,22 +46,21 @@ class Settings:
 
 
 	def update(page):
-		for name,button in page.buttons.items():
-			button.checkHover(page.game.mousepos)		
+		for _,obj in page.buttons.items():
+			obj.state = 1 if obj.isHover(page.game.mousepos) else 0	
 
-		if page.textboxABC.rect.collidepoint(page.game.mousepos):
-			if page.textboxABC.box['boarderSize'] != 3:
-				page.textboxABC.box['boarderSize'] = 3
-				page.textboxABC.renderBox(True)
+		if page.textbox['textboxABC'].rect.collidepoint(page.game.mousepos):
+			if page.textbox['textboxABC'].box['boarderSize'] != 3:
+				page.textbox['textboxABC'].box['boarderSize'] = 3
+				page.textbox['textboxABC'].renderBox(True)
 		else:
-			if page.textboxABC.box['boarderSize'] != 0:
-				page.textboxABC.box['boarderSize'] = 0
-				page.textboxABC.renderBox(True)
+			if page.textbox['textboxABC'].box['boarderSize'] != 0:
+				page.textbox['textboxABC'].box['boarderSize'] = 0
+				page.textbox['textboxABC'].renderBox(True)
 
 	def draw(page):
-		page.game.screen.fill((100, 100, 100))
-		page.game.screen.blit(EXITTXT, (20, 20))
+		page.game.screen.blit(page.bg,(0,0))
 
-		page.textboxABC.draw(page.game.screen)
-		for name,button in page.buttons.items():
-			button.draw(page.game.screen)
+		for _,group in sorted(page.groups.items()):
+			for _,obj in group.items():
+				obj.draw(page.game.screen)

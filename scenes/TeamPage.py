@@ -1,10 +1,7 @@
 import pygame
-import random
 from stuff import *
 
-FONT24 = pygame.font.SysFont(None, 24)
-FONT40 = pygame.font.SysFont(None, 40)
-EXITTXT = FONT24.render('Press Esc, it stands for Escape!', True, (255, 255, 255))
+EXITTXT = pygame.font.SysFont(None, 24).render('Press Esc, it stands for Escape!', True, (255, 255, 255))
 
 class Party:
 	def __init__(page,game):
