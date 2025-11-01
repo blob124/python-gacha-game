@@ -65,6 +65,8 @@ class GachaPlace(Scene):
 				[TextBox(pygame.Rect(0,0,50,50),bgcolor=(255,255,0,255),text='Option',textcolor=(247,13,26),textsize=18,aligncenter=True)],
 				[TextBox(pygame.Rect(0,0,50,50),bgcolor=(190,190,0,255),text='Option',textcolor=(247,13,26),textsize=18,aligncenter=True)]
 		)
+	def enter(page):
+		page.bg = page.banners[page.currentbanner].bg
 
 		page.ui['kurenzy'] = TextBox(pygame.Rect(0,40,100,50),bgcolor=(255,255,255,255),text=f'kurenzy: {page.game.currency}',textsize=28).resize_fit(padding=5)
 
