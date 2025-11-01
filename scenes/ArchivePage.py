@@ -20,12 +20,12 @@ class Archive(Scene):
 						0:page.images,
 				 		1:page.buttons}
 
-		page.buttons['buttonname'] = SimpleButton(pygame.Rect(200,450,100,50),
+		page.buttons['buttonname'] = SimpleButton(pygame.Rect(50,520,100,50),
 			[TextBox(pygame.Rect(0,0,100,50),bgcolor=(0,255,0),text='TEXT HERE',textcolor=(247,13,26),aligncenter=True)],
-			[TextBox(pygame.Rect(0,0,100,50),bgcolor=(0,255,0),text='HOVERING',textcolor=(247,13,26),aligncenter=True)]
+			[TextBox(pygame.Rect(0,0,100,50),bgcolor=(0,190,0),text='HOVERING',textcolor=(247,13,26),aligncenter=True)]
 		)
 
-		page.buttons['alsobuttonname'] = SimpleButton(pygame.Rect(400,450,100,50),
+		page.buttons['alsobuttonname'] = SimpleButton(pygame.Rect(170,520,100,50),
 			[TextBox(pygame.Rect(0,0,100,50),bgcolor=(0,190,255),text='TEXT HERE\n2',textcolor=(247,13,26),aligncenter=True)],
 			[TextBox(pygame.Rect(0,0,100,50),bgcolor=(0,144,190),text='HOVERINGING',textcolor=(247,13,26),textsize=18,aligncenter=True)])
 
@@ -33,11 +33,11 @@ class Archive(Scene):
 		char_0_icon = page.game.data['Man'].getIcon(bg=True)
 		char_0_art = page.game.data['Man'].getArt()
 		one_image = pygame.image.load('data/numba1.png').convert_alpha()
-		one_image = pygame.transform.scale_by(one_image, (2, 0.2))
+		one_image = pygame.transform.scale_by(one_image, (1.5, 0.15))
 
 		page.char_icons['image0'] = Image(char_0_icon,(50,75))
 		page.char_arts['image1'] = Image(char_0_art,(650,75))
-		page.images['one'] = Image(one_image,(150,200))
+		page.images['one'] = Image(one_image,(290,513))
 
 	def handle_events(page, events):
 		for event in events:

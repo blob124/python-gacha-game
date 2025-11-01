@@ -113,13 +113,21 @@ class TextBox:
 		else:
 			padding = 5
 			self.sprite.blit(sprText,(padding,self.rect.h/2-sprText.get_height()/2))
+	
+	def resize_fit(self,padding=0):
+		old_topleft = self.rect.topleft
+		self.rect = self.text['sprite'].get_rect().inflate(padding*2,padding*2)
+		self.rect.topleft = old_topleft
+		self.aligncenter = True
+		self.renderBox(update=True)
+		return self
 
 	def draw(self, screen):
 		screen.blit(self.sprite, self.rect)
 
 class Interactable:
 	def __init__(self,xy,*states):
-		"""
+		"""---
 		xy: (x,y)\n
 		states: state0, state1, ...\n
 		state: [pygame.Rect(0,0,width,height), imageSurface]
@@ -142,7 +150,7 @@ class Interactable:
 
 class SimpleButton(Interactable):
 	def __init__(self,rect,*sprites):
-		"""
+		"""---
 		rect: pygame.Rect(x,y,width,height)\n
 		sprites: state0, state1, ...\n
 		sprite: [imageSurface]
