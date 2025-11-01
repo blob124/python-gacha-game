@@ -127,7 +127,7 @@ class TextBox:
 
 class Interactable:
 	def __init__(self,xy,*states):
-		"""
+		"""---
 		xy: (x,y)\n
 		states: state0, state1, ...\n
 		state: [pygame.Rect(0,0,width,height), imageSurface]
@@ -150,7 +150,7 @@ class Interactable:
 
 class SimpleButton(Interactable):
 	def __init__(self,rect,*sprites):
-		"""
+		"""---
 		rect: pygame.Rect(x,y,width,height)\n
 		sprites: state0, state1, ...\n
 		sprite: [imageSurface]
