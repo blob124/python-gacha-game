@@ -113,6 +113,14 @@ class TextBox:
 		else:
 			padding = 5
 			self.sprite.blit(sprText,(padding,self.rect.h/2-sprText.get_height()/2))
+	
+	def resize_fit(self,padding=0):
+		old_topleft = self.rect.topleft
+		self.rect = self.text['sprite'].get_rect().inflate(padding*2,padding*2)
+		self.rect.topleft = old_topleft
+		self.aligncenter = True
+		self.renderBox(update=True)
+		return self
 
 	def draw(self, screen):
 		screen.blit(self.sprite, self.rect)

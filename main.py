@@ -28,7 +28,7 @@ class Game:
 
 		pygame.mixer.init()
 		pygame.mixer.music.load(f'data/sfx/music.mp3')
-		pygame.mixer.music.set_volume(0.4)
+		pygame.mixer.music.set_volume(0.6)
 
 		game.change_scene(game.scenes['GachaPlace'])
 		pygame.mixer.music.play(-1)
