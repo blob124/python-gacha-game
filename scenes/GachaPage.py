@@ -40,13 +40,13 @@ class GachaPlace(Scene):
 				[TextBox(pygame.Rect(0,0,50,80),bgcolor=(190,190,190,255),text='>',textsize=96,aligncenter=True)]
 		)
 		
-		page.buttons['roll1'] = SimpleButton(pygame.Rect(200,450,100,50),
-				[TextBox(pygame.Rect(0,0,100,50),bgcolor=(255,255,0,255),text='roll1',textcolor=(247,13,26),textsize=40,aligncenter=True)],
-				[TextBox(pygame.Rect(0,0,100,50),bgcolor=(190,190,0,255),text='roll1',textcolor=(247,13,26),textsize=40,aligncenter=True)]
+		page.buttons['roll1'] = SimpleButton(pygame.Rect(200,500,100,50),
+				[TextBox(pygame.Rect(0,0,100,50),bgcolor=(255,255,0,255),text='roll1\nx160',textcolor=(247,13,26),textsize=30,aligncenter=True)],
+				[TextBox(pygame.Rect(0,0,100,50),bgcolor=(190,190,0,255),text='roll1\nx160',textcolor=(247,13,26),textsize=30,aligncenter=True)]
 		)
-		page.buttons['roll10'] = SimpleButton(pygame.Rect(769,450,100,50),
-				[TextBox(pygame.Rect(0,0,100,50),bgcolor=(255,255,0,255),text='roll10',textcolor=(247,13,26),textsize=40,aligncenter=True)],
-				[TextBox(pygame.Rect(0,0,100,50),bgcolor=(190,190,0,255),text='roll10',textcolor=(247,13,26),textsize=40,aligncenter=True)]
+		page.buttons['roll10'] = SimpleButton(pygame.Rect(769,500,100,50),
+				[TextBox(pygame.Rect(0,0,100,50),bgcolor=(255,255,0,255),text='roll10\nx1600',textcolor=(247,13,26),textsize=30,aligncenter=True)],
+				[TextBox(pygame.Rect(0,0,100,50),bgcolor=(190,190,0,255),text='roll10\nx1600',textcolor=(247,13,26),textsize=30,aligncenter=True)]
 		)
 		
 		page.buttons['goMission'] = SimpleButton(pygame.Rect(790,25,50,50),
@@ -65,6 +65,9 @@ class GachaPlace(Scene):
 				[TextBox(pygame.Rect(0,0,50,50),bgcolor=(255,255,0,255),text='Option',textcolor=(247,13,26),textsize=18,aligncenter=True)],
 				[TextBox(pygame.Rect(0,0,50,50),bgcolor=(190,190,0,255),text='Option',textcolor=(247,13,26),textsize=18,aligncenter=True)]
 		)
+
+		page.ui['kurenzy'] = TextBox(pygame.Rect(0,40,100,50),bgcolor=(255,255,255,255),text=f'kurenzy: {page.game.currency}',textsize=28).resize_fit(padding=5)
+
 	def enter(page):
 		page.bg = page.banners[page.currentbanner].bg
 
@@ -122,6 +125,10 @@ class GachaPlace(Scene):
 				page.game.screen.blit(char.getIcon(bg=True), (page.game.screen.get_width()/2-40+(c-2)*120,200+r*100))
 
 	def roll(page,rolls=1):
+		page.game.currency -= rolls*160
+		page.ui['kurenzy'].text['string'] = f'kurenzy: {page.game.currency}'
+		page.ui['kurenzy'].renderText(True)
+		page.ui['kurenzy'].resize_fit(padding=5)
 		for _ in range(rolls):
 			daroll = page.banners[page.currentbanner].singleroll()
 			page.game.increase_char_obtain(daroll.name)

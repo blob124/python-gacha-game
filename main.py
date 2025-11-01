@@ -77,7 +77,7 @@ class Game:
 					game.char_obtained[name] = int(dup)
 
 				game.party = party.strip().split(',')
-				game.currency = currency.strip()
+				game.currency = int(currency.strip())
 		else:
 			print('something error')
 			pygame.quit()
@@ -95,6 +95,12 @@ class Game:
 			game.char_obtained[charname] = amount
 		else:
 			game.char_obtained[charname] += amount
+	
+	def reset_profile(self):
+		game.char_obtained = {}
+		game.party = ['','','','','']
+		game.currency = 6700
+		game.saveData()
 
 	def change_scene(game, new_scene):
 		game.scene = new_scene
