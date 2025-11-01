@@ -20,8 +20,8 @@ class Game:
 
 		game.loadData()
 		game.scenes = {	'GachaPlace':GachaPlace(game),
-						'Missions':Scene(game),
-						'TeamUp':Scene(game),
+						'Missions':Mission(game),
+						'TeamUp':Party(game),
 						'ArchivePage':Archive(game),
 						'OptionPage':Settings(game)
 		}
@@ -146,7 +146,20 @@ class Character:
 		return art
 
 game = Game()
-game.run()
+DEBUGGING = False
+if not DEBUGGING:
+	game.run()
+else:
+	import cProfile
+
+	if __name__ == "__main__":
+		profiler = cProfile.Profile()
+		profiler.enable()
+		
+		game.run()
+		
+		profiler.disable()
+		profiler.print_stats(sort="cumtime")
 
 pygame.quit()
 sys.exit()
