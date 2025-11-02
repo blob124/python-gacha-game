@@ -57,7 +57,7 @@ class Settings(Scene):
 					else:
 						page.inputbox['music'].state = 0
 						pygame.mixer.music.pause()
-						pygame.mixer.music.set_pos(0.2)
+						pygame.mixer.music.set_pos(0)
 				elif page.inputbox['reset'].isHover(page.game.mousepos):
 					if page.inputbox['reset'].in_special_state:
 						page.game.reset_profile()

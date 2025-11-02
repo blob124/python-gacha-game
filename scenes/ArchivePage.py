@@ -28,16 +28,19 @@ class Archive(Scene):
 		page.buttons['alsobuttonname'] = SimpleButton(pygame.Rect(170,520,100,50),
 			[TextBox(pygame.Rect(0,0,100,50),bgcolor=(0,190,255),text='TEXT HERE\n2',textcolor=(247,13,26),aligncenter=True)],
 			[TextBox(pygame.Rect(0,0,100,50),bgcolor=(0,144,190),text='HOVERINGING',textcolor=(247,13,26),textsize=18,aligncenter=True)])
+		
+		page.images['charlist'] = TextBox(pygame.Rect(50,75,100,50),bgcolor=(255,255,255,255),text='',textsize=28,aligncenter=False)
 
 	def enter(page):
 		char_0_icon = page.game.data['Man'].getIcon(bg=True)
 		char_0_art = page.game.data['Man'].getArt()
-		one_image = pygame.image.load('data/numba1.png').convert_alpha()
-		one_image = pygame.transform.scale_by(one_image, (1.5, 0.15))
 
 		page.char_icons['image0'] = Image(char_0_icon,(50,75))
 		page.char_arts['image1'] = Image(char_0_art,(650,75))
-		page.images['one'] = Image(one_image,(290,513))
+		
+		#for demo
+		page.images['charlist'].text['sprite'] = renderTextWithLines(f'{'\n'.join([f'{char}:{' '*max(0,round(2.5*(12-len(str(char)+':'+str(dup)))))}{dup}' for char,dup in page.game.char_obtained.items()])}',size=28,horizontal_align='left')
+		page.images['charlist'].resize_fit(padding=5)
 
 	def handle_events(page, events):
 		for event in events:
