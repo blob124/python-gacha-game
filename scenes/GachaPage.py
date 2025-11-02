@@ -69,7 +69,8 @@ class GachaPlace(Scene):
 
 	def enter(page):
 		page.bg = page.banners[page.currentbanner].bg
-
+		page.reload_currency()
+		
 	def handle_events(page, events):
 		for event in events:
 			if not page.displayroll:
@@ -124,14 +125,17 @@ class GachaPlace(Scene):
 				page.game.screen.blit(char.getIcon(bg=True), (page.game.screen.get_width()/2-40+(c-2)*120,200+r*100))
 
 	def roll(page,rolls=1):
-		page.game.currency -= rolls*160
-		page.ui['kurenzy'].text['string'] = f'kurenzy: {page.game.currency}'
-		page.ui['kurenzy'].renderText(True)
-		page.ui['kurenzy'].resize_fit(padding=5)
+		page.reload_currency(-rolls*160)
 		for _ in range(rolls):
 			daroll = page.banners[page.currentbanner].singleroll()
 			page.game.increase_char_obtain(daroll.name)
 			page.justroll.append(daroll)
+	
+	def reload_currency(page,delta=0):
+		page.game.currency += delta
+		page.ui['kurenzy'].text['string'] = f'kurenzy: {page.game.currency}'
+		page.ui['kurenzy'].renderText(True)
+		page.ui['kurenzy'].resize_fit(padding=5)
 	
 	def changeBanner(page, step=1):
 		page.currentbanner += step
