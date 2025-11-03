@@ -27,7 +27,8 @@ class Archive(Scene):
 
 		page.buttons['alsobuttonname'] = SimpleButton(pygame.Rect(170,520,100,50),
 			[TextBox(pygame.Rect(0,0,100,50),bgcolor=(0,190,255),text='TEXT HERE\n2',textcolor=(247,13,26),aligncenter=True)],
-			[TextBox(pygame.Rect(0,0,100,50),bgcolor=(0,144,190),text='HOVERINGING',textcolor=(247,13,26),textsize=18,aligncenter=True)])
+			[TextBox(pygame.Rect(0,0,100,50),bgcolor=(0,144,190),text='HOVERINGING',textcolor=(247,13,26),textsize=18,aligncenter=True)]
+		)
 		
 		page.images['charlist'] = TextBox(pygame.Rect(50,75,100,50),bgcolor=(255,255,255,255),text='',textsize=28,aligncenter=False)
 
@@ -48,16 +49,13 @@ class Archive(Scene):
 				if event.key == pygame.K_RETURN:
 					pass
 				elif event.key == pygame.K_ESCAPE:
-						page.game.change_scene(page.game.scenes['GachaPlace'])
+						page.game.change_scene('GachaPlace')
 			elif event.type == pygame.MOUSEBUTTONDOWN and event.button == 1: # detect mouseclick
-				if page.buttons['buttonname'].state == 1: # is Hover
-					pass
-				elif page.buttons['alsobuttonname'].state == 1:
-					pass
+				pass
 
 	def update(page):
-		for _,obj in page.buttons.items():
-			obj.state = 1 if obj.isHover(page.game.mousepos) else 0
+		for _,button in page.buttons.items():
+			button.update(page.game.mousepos)
 
 	def draw(page):
 		page.game.screen.blit(page.bg,(0,0))

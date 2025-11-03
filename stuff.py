@@ -26,7 +26,7 @@ class Scene:
 		for event in events:
 			if event.type == pygame.KEYDOWN:
 				if event.key == pygame.K_ESCAPE:
-					page.game.change_scene(page.game.scenes['GachaPlace'])
+					page.game.change_scene('GachaPlace')
 			elif event.type == pygame.MOUSEBUTTONDOWN and event.button == 1: # detect mouseclick
 				pass
 
@@ -126,36 +126,43 @@ class TextBox:
 		screen.blit(self.sprite, self.rect)
 
 class Interactable:
-	def __init__(self,xy,*states):
+	def __init__(self,xy,*states, callback=None):
 		"""---
 		xy: (x,y)\n
 		states: state0, state1, ...\n
 		state: [pygame.Rect(0,0,width,height), imageSurface]
 		"""
 		self.x, self.y = xy
+		self.hovered = False
 		self.state = 0
 		self.states = []
+		self.callback = callback
 		for state in states:
 			daHitbox, daSprite = state
 			self.states.append({'hitbox':daHitbox,'sprite':daSprite})
+	
+	def update(self, mouse_pos):
+		self.hovered = self.curState()['hitbox'].move(self.x,self.y).collidepoint(mouse_pos)
 
 	def curState(self):
-		return self.states[self.state]
-	
-	def isHover(self,mousepos):
-		return self.curState()['hitbox'].move(self.x,self.y).collidepoint(mousepos)
+		return self.states[self.state*2 + (1 if self.hovered else 0)]
 
 	def draw(self,screen):
 		screen.blit(self.curState().get('sprite').sprite, (self.x,self.y))
+	
+	def handle_event(self, event):
+		if event.type == pygame.MOUSEBUTTONDOWN and event.button == 1:
+			if self.hovered and self.callback:
+				self.callback()
 
 class SimpleButton(Interactable):
-	def __init__(self,rect,*sprites):
+	def __init__(self,rect,*sprites, callback=None):
 		"""---
 		rect: pygame.Rect(x,y,width,height)\n
 		sprites: state0, state1, ...\n
 		sprite: [imageSurface]
 		"""
-		super().__init__(rect.topleft,*[[pygame.Rect(0,0,rect.w,rect.h),*sprite] for sprite in sprites])
+		super().__init__(rect.topleft,*[[pygame.Rect(0,0,rect.w,rect.h),*sprite] for sprite in sprites],callback=callback)
 
 def renderTextWithLines(text,textColor=(0,0,0),size=24,font=pygame.font.SysFont(None, 24),anti_alias=True,horizontal_align='Middle'):
 	thefont = pygame.font.SysFont(None, size)
@@ -184,6 +191,20 @@ def renderTextWithLines(text,textColor=(0,0,0),size=24,font=pygame.font.SysFont(
 			text_render_y += height+newlineOffY
 	
 	return text_surface
+
+def toggle_music(game):
+	if game.musicplaying:
+		game.musicplaying = False
+		pygame.mixer.music.pause()
+		pygame.mixer.music.set_pos(0)
+	else:
+		game.musicplaying = True
+		pygame.mixer.music.unpause()
+
+def make_colorsurface(size,color):
+	sf = pygame.Surface(size)
+	sf.fill(color)
+	return sf
 
 def RGBtoHSV(r,g,b):
 	r0,g0,b0 = r/255,g/255,b/255

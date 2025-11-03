@@ -26,7 +26,10 @@ class Settings(Scene):
 
 		page.inputbox['music'] = Interactable((600,150),
 			[pygame.Rect(4,4,32,32),Image(pygame.image.load(f'data/images/checkbox_0.png').convert_alpha(),(0,0))],
-			[pygame.Rect(4,4,32,32),Image(pygame.image.load(f'data/images/checkbox_1.png').convert_alpha(),(0,0))]
+			[pygame.Rect(4,4,32,32),Image(pygame.image.load(f'data/images/checkbox_0.png').convert_alpha(),(0,0))],
+			[pygame.Rect(4,4,32,32),Image(pygame.image.load(f'data/images/checkbox_1.png').convert_alpha(),(0,0))],
+			[pygame.Rect(4,4,32,32),Image(pygame.image.load(f'data/images/checkbox_1.png').convert_alpha(),(0,0))],
+			callback=lambda: (toggle_music(page.game), setattr(page.inputbox['music'], 'state', 1 if page.game.musicplaying else 0))
 		)
 		page.inputbox['music'].state = 1
 
@@ -38,9 +41,9 @@ class Settings(Scene):
 			[TextBox(pygame.Rect(0,0,100,50),bgcolor=(128,128,160),text='Reset',textcolor=(247,13,26),aligncenter=True)],
 			[TextBox(pygame.Rect(0,0,100,50),bgcolor=(78,78,97),text='Reset',textcolor=(247,13,26),aligncenter=True)],
 			[TextBox(pygame.Rect(0,0,100,50),bgcolor=(255,0,0),text='ARE YOU\nSURE?',textcolor=(0,0,0),textsize=24,aligncenter=True)],
-			[TextBox(pygame.Rect(0,0,100,50),bgcolor=(190,0,0),text='ARE YOU\nSURE?',textcolor=(0,0,0),textsize=24,aligncenter=True)]
+			[TextBox(pygame.Rect(0,0,100,50),bgcolor=(190,0,0),text='ARE YOU\nSURE?',textcolor=(0,0,0),textsize=24,aligncenter=True)],
+			callback=lambda: (page.game.reset_profile() if page.inputbox['reset'].state==1 else None, setattr(page.inputbox['reset'], 'state', 0 if page.inputbox['reset'].state==1 else 1))
 		)
-		page.inputbox['reset'].in_special_state = False
 
 	def handle_events(page, events):
 		for event in events:
@@ -48,37 +51,21 @@ class Settings(Scene):
 				if event.key == pygame.K_RETURN:
 					pass
 				elif event.key == pygame.K_ESCAPE:
-						page.game.change_scene(page.game.scenes['GachaPlace'])
+					page.game.change_scene('GachaPlace')
 			elif event.type == pygame.MOUSEBUTTONDOWN and event.button == 1: # detect mouseclick
-				if page.inputbox['music'].isHover(page.game.mousepos):
-					if page.inputbox['music'].state == 0:
-						page.inputbox['music'].state = 1
-						pygame.mixer.music.unpause()
-					else:
-						page.inputbox['music'].state = 0
-						pygame.mixer.music.pause()
-						pygame.mixer.music.set_pos(0)
-				elif page.inputbox['reset'].isHover(page.game.mousepos):
-					if page.inputbox['reset'].in_special_state:
-						page.game.reset_profile()
-
-					page.inputbox['reset'].in_special_state = not page.inputbox['reset'].in_special_state
+				pass
+			
+			for _,group in sorted(page.groups.items()):
+				for _,obj in group.items():
+					if hasattr(obj, 'handle_event') and callable(getattr(obj, 'handle_event')):
+						obj.handle_event(event)
 
 	def update(page):
-		for _,obj in page.buttons.items():
-			obj.state = 1 if obj.isHover(page.game.mousepos) else 0
+		for _,button in page.buttons.items():
+			button.update(page.game.mousepos)
 		
-		reset_box = page.inputbox['reset']
-		if not reset_box.in_special_state:
-			if not reset_box.isHover(page.game.mousepos):
-				reset_box.state = 0
-			else:
-				reset_box.state = 1
-		else:
-			if not reset_box.isHover(page.game.mousepos):
-				reset_box.state = 2
-			else:
-				reset_box.state = 3
+		page.inputbox['music'].update(page.game.mousepos)
+		page.inputbox['reset'].update(page.game.mousepos)
 
 		if page.inputbox['redeem'].rect.collidepoint(page.game.mousepos):
 			if page.inputbox['redeem'].box['boarderSize'] != 3:
