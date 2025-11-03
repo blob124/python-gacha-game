@@ -18,6 +18,12 @@ class Game:
 		pygame.display.set_caption("Gacha Gambling")
 		game.clock = pygame.time.Clock()
 
+		pygame.mixer.init()
+		pygame.mixer.music.load(f'data/sfx/music.mp3')
+		pygame.mixer.music.set_volume(0.6)
+		pygame.mixer.music.play(-1)
+		game.musicplaying = True
+
 		game.loadData()
 		game.scenes = {	'GachaPlace':GachaPlace(game),
 						'Missions':Scene(game),
@@ -26,12 +32,7 @@ class Game:
 						'OptionPage':Settings(game)
 		}
 
-		pygame.mixer.init()
-		pygame.mixer.music.load(f'data/sfx/music.mp3')
-		pygame.mixer.music.set_volume(0.6)
-
-		game.change_scene(game.scenes['GachaPlace'])
-		pygame.mixer.music.play(-1)
+		game.change_scene('GachaPlace')
 
 	def run(game):
 		game.running = True
@@ -103,7 +104,7 @@ class Game:
 		game.saveData()
 
 	def change_scene(game, new_scene):
-		game.scene = new_scene
+		game.scene = game.scenes[new_scene]
 		game.scene.enter()
 
 RANK_COLOR = [(124,142,161),(100,156,128),(91,150,186),(160,119,201),(204,152,88)]
@@ -146,7 +147,20 @@ class Character:
 		return art
 
 game = Game()
-game.run()
+DEBUGGING = False
+if not DEBUGGING:
+	game.run()
+else:
+	import cProfile
+
+	if __name__ == "__main__":
+		profiler = cProfile.Profile()
+		profiler.enable()
+		
+		game.run()
+		
+		profiler.disable()
+		profiler.print_stats(sort="cumtime")
 
 pygame.quit()
 sys.exit()

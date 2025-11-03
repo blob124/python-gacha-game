@@ -3,25 +3,40 @@ from stuff import *
 
 EXITTXT = pygame.font.SysFont(None, 24).render('Press Esc, it stands for Escape!', True, (255, 255, 255))
 
-class Party:
+class Party(Scene):
 	def __init__(page,game):
 		page.game = game
-		page.party = [None,None,None,None,None]
 
-		char_0_icon = page.game.data['Man'].getIcon()
+		page.bg = pygame.Surface(page.game.screen.get_size())
+		page.bg.fill((0,43,128))
+		page.bg.blit(EXITTXT,(20,20))
 
 		page.images = {}
-		page.images['image0'] = Image(char_0_icon,(50,75))
+		page.char_icons = {}
+		page.char_arts = {}
+		page.buttons = {}
+		page.groups = {	-2:page.char_icons,
+				 		-1:page.char_arts,
+						0:page.images,
+				 		1:page.buttons}
+
+		page.party = [None,None,None,None,None]
+
+		char_0_icon = page.game.data['Man'].getIcon(True)
+
+		page.char_icons[0] = Image(char_0_icon,(50,75))
 
 		page.images['powerlevel'] = TextBox(pygame.Rect(80,520,300,50),bgcolor=(0,225,0),text='PowerLevel: 0',textcolor=(255,190,190),textsize=32)
 
-		page.buttons = {}
 		page.buttons['buttonname'] = SimpleButton(pygame.Rect(950,520,80,40),
 			[TextBox(pygame.Rect(0,0,80,40),(0,255,0),text='TEXT HERE',textcolor=(247,13,26),textsize=20)],
 			[TextBox(pygame.Rect(0,0,80,40),(0,190,0),text='TEXT HERE',textcolor=(247,13,26),textsize=20)]
 		)
 
 		page.updateParty()
+	
+	def enter(page):
+		pass
 
 	def updateParty(page):
 		for i in range(5):
@@ -32,7 +47,7 @@ class Party:
 
 			theart = page.game.data[char].getArt()
 			theart = pygame.transform.scale_by(theart, (0.5, 0.5))
-			page.images[f'slot{i}'] = Image(theart,(433+(i-2)*160,300))
+			page.char_arts[i] = Image(theart,(433+(i-2)*160,300))
 		
 		page.images['powerlevel'].text['string'] = f'PowerLevel: {sum([page.game.data[char].power for char in page.party])}'
 
@@ -48,17 +63,22 @@ class Party:
 					pass
 
 	def update(page):
-		for name,button in page.buttons.items():
-			button.checkHover(page.game.mousepos)
+		for _,obj in page.buttons.items():
+			obj.state = 1 if obj.isHover(page.game.mousepos) else 0
 
 	def draw(page):
-		page.game.screen.fill((30, 30, 160))
-		page.game.screen.blit(EXITTXT, (20, 20))
+		page.game.screen.blit(page.bg,(0,0))
 
-		for id,image in page.images.items():
-			image.draw(page.game.screen)
+		for _,group in sorted(page.groups.items()):
+			for _,obj in group.items():
+				obj.draw(page.game.screen)
 
-		for name,button in page.buttons.items():
-			button.draw(page.game.screen)
-		
 		pygame.draw.line(page.game.screen, (255,255,255), (50,280), (1067-50,280), 1)
+
+	class PartyIcon(Interactable):
+		def __init__(self):
+			pass
+	
+	class PartyArt(Interactable):
+		def __init__(self,xy):
+			super().__init__(xy,[])
