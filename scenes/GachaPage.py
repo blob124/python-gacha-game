@@ -41,13 +41,11 @@ class GachaPlace(Scene):
 		)
 		
 		page.buttons['roll1'] = SimpleButton(pygame.Rect(200,500,100,50),
-				[TextBox(pygame.Rect(0,0,100,50),bgcolor=(255,255,0,255),text='roll1\nx160',textcolor=(247,13,26),textsize=30,aligncenter=True)],
-				[TextBox(pygame.Rect(0,0,100,50),bgcolor=(190,190,0,255),text='roll1\nx160',textcolor=(247,13,26),textsize=30,aligncenter=True)],
+				*[[TextBox(pygame.Rect(0,0,100,50),bgcolor=(255,255,0,255) if i==0 else (190,190,0,255),text=f'roll1\nx{banner.price}',textcolor=(247,13,26),textsize=30,aligncenter=True)] for banner in page.banners for i in range(2)],
 			callback=lambda: page.roll(1)
 		)
 		page.buttons['roll10'] = SimpleButton(pygame.Rect(769,500,100,50),
-				[TextBox(pygame.Rect(0,0,100,50),bgcolor=(255,255,0,255),text='roll10\nx1600',textcolor=(247,13,26),textsize=30,aligncenter=True)],
-				[TextBox(pygame.Rect(0,0,100,50),bgcolor=(190,190,0,255),text='roll10\nx1600',textcolor=(247,13,26),textsize=30,aligncenter=True)],
+				*[[TextBox(pygame.Rect(0,0,100,50),bgcolor=(255,255,0,255) if i==0 else (190,190,0,255),text=f'roll10\nx{10*banner.price}',textcolor=(247,13,26),textsize=30,aligncenter=True)] for banner in page.banners for i in range(2)],
 			callback=lambda: page.roll(10)
 		)
 		
@@ -139,11 +137,9 @@ class GachaPlace(Scene):
 		page.currentbanner += step
 		page.currentbanner %= len(page.banners)
 		page.bg = page.currentBanner().bg
-		
-		for btn,text,mul in [(page.buttons['roll1'],'roll1',1),(page.buttons['roll10'],'roll10',10)]:
-			for state in btn.states:
-				state.get('sprite').text['string'] = f'{text}\nx{mul*page.currentBanner().price}'
-				state.get('sprite').renderText(True)
+
+		for btn in [page.buttons['roll1'],page.buttons['roll10']]:
+			btn.state = page.currentbanner
 
 	class Banner:
 		def __init__(self,gamechar,id,name,charlist,dropRateByRarity,price,bg):
