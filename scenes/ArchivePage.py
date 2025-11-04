@@ -33,8 +33,8 @@ class Archive(Scene):
 		page.images['charlist'] = TextBox(pygame.Rect(50,75,100,50),bgcolor=(255,255,255,255),text='',textsize=28,aligncenter=False)
 
 	def enter(page):
-		char_0_icon = page.game.data['Man'].getIcon(bg=True)
-		char_0_art = page.game.data['Man'].getArt()
+		char_0_icon = page.game.data['King Rabit'].getIcon(bg=True)
+		char_0_art = page.game.data['King Rabit'].getArt()
 
 		page.char_icons['image0'] = Image(char_0_icon,(50,75))
 		page.char_arts['image1'] = Image(char_0_art,(650,75))
@@ -64,4 +64,4 @@ class Archive(Scene):
 			for _,obj in group.items():
 				obj.draw(page.game.screen)
 		
-		pygame.draw.line(page.game.screen, (255,255,255), (650,80), (650,520), 1)
+		pygame.draw.line(page.game.screen, (255,255,255), (630,80), (630,520), 1)

@@ -22,8 +22,15 @@ class GachaPlace(Scene):
 		page.displayroll = False
 
 		page.banners = [
-			page.Banner(page.game.data,'tarvRC','Tarvern Recruit', ('Man','Woman','Unnamed01','Unnamed02'), [0,0,90,9.4,0.6],price=160,bg=make_colorsurface(page.game.screen.get_size(),(30,100,130))),
-			page.Banner(page.game.data,'pp0','Pally Pal', ('Scribble','Redrill','Pebble'), [73,21,6,0,0],price=80,bg=make_colorsurface(page.game.screen.get_size(),(30,190,130)))
+			page.Banner(page.game.data,'military','Bnuuy Recruit',
+				('Unnamed04','Unnamed03','Unnamed02'),
+				[10,30,50,9.4,0.6],price=160,bg=make_colorsurface(page.game.screen.get_size(),(100,130,30))),
+			page.Banner(page.game.data,'politician','Politic Hare',
+				('King Rabit','Unnamed04'),
+				[10,30,50,9.4,0.6],price=120,bg=make_colorsurface(page.game.screen.get_size(),(30,100,130))),
+			page.Banner(page.game.data,'student','Rabit Education',
+				('Unnamed05',),
+				[10,30,50,9.4,0.6],price=80,bg=make_colorsurface(page.game.screen.get_size(),(130,100,130)))
 		]
 		page.currentbanner = 0
 
@@ -145,18 +152,18 @@ class GachaPlace(Scene):
 		def __init__(self,gamechar,id,name,charlist,dropRateByRarity,price,bg):
 			self.id = id
 			self.name = name
-			self.banner_rank = {1:[],2:[],3:[],4:[],5:[]}
+			self.banner_by_rank = {rank+1:(dr,[]) for rank,dr in enumerate(dropRateByRarity)}
 			self.price = price
 			for charname in charlist:
 				char = gamechar[charname]
-				self.banner_rank[char.rarity].append(char)
-			self.droprate = [dr if len(self.banner_rank[i+1])>0 else 0 for i,dr in enumerate(dropRateByRarity)]
+				if char.rarity in self.banner_by_rank:
+					self.banner_by_rank[char.rarity][1].append(char)
 
 			self.bg = bg
 			self.bg.blit(TextBox(pygame.Rect(0,0,100,50),text=self.id,antialias=False).sprite,(0,0))
 
 		def singleroll(self):
 				'''return a Character Class'''
-				getrank = random.choices([1,2,3,4,5], weights=self.droprate,k=1)[0]
-				same_rarity_char = self.banner_rank[getrank]
+				getrank = random.choices([1,2,3,4,5], weights=[self.banner_by_rank[i][0] if self.banner_by_rank[i][1] else 0 for i in [1,2,3,4,5]],k=1)[0]
+				same_rarity_char = self.banner_by_rank[getrank][1]
 				return random.choices(same_rarity_char)[0]

@@ -1,8 +1,6 @@
-Unnamed01_unm01_5_1500
-Unnamed02_unm02_4_670
-Man_man_3_300
-Woman_woman_3_300
-Scribble_scribble_3_167
-Redrill_redrill_2_77
-Pebble_pebble_1_18
-PHD_placeholder_0_0
+King Rabit,king_rabbit,5,1000
+Unnamed02,unm02,4,500
+Unnamed03,unm03,3,100
+Unnamed04,unm04,2,40
+Unnamed05,unm05,1,10
+PHD,placeholder,0,0

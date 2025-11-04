@@ -63,7 +63,7 @@ class Game:
 		if Path('data/characterlist.txt').is_file():
 			with open('data/characterlist.txt','r') as charFile:
 				for line in charFile:
-					name,path_to_image,rarity,power = line.strip().split('_')
+					name,path_to_image,rarity,power = line.strip().split(',')
 					game.data[name] = Character(name,int(rarity),int(power),path_to_image)
 		else:
 			print('character data file not found :sad:')
@@ -138,11 +138,12 @@ class Character:
 	def getArt(self):
 		art = self.imgArt
 		if art is None:
+			artX, artY = 400,460
 			if Path(f'data/images/characters/{self.imgpath}_art.png').is_file():
-				art = pygame.transform.scale(pygame.image.load(f'data/images/characters/{self.imgpath}_art.png').convert_alpha(), (400, 450))
+				art = pygame.transform.scale(pygame.image.load(f'data/images/characters/{self.imgpath}_art.png').convert_alpha(), (artX, artY))
 				self.imgArt = art
 			else:
-				art = pygame.transform.scale(pygame.image.load(f'data/images/characters/placeholder_art.png').convert_alpha(), (400, 450))
+				art = pygame.transform.scale(pygame.image.load(f'data/images/characters/placeholder_art.png').convert_alpha(), (artX, artY))
 				
 		return art
 
