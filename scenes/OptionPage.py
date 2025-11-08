@@ -33,7 +33,7 @@ class Settings(Scene):
 		)
 		page.inputbox['music'].state = 1
 
-		page.inputbox['redeem'] = CoolTextBox(Box(pygame.Rect(600,250,400,40),bgcolor=(255,255,255)),Text('defaultText'),callback=lambda txtbx: enterCode(txtbx.text.text))
+		page.inputbox['redeem'] = CoolTextBox(Box(pygame.Rect(600,250,400,40),bgcolor=(255,255,255)),Text('defaultText'),callback=lambda: enterCode(page.inputbox['redeem'].text.text))
 		page.inputbox['redeem'].text.text = 'Hi pookie!!'
 		page.inputbox['redeem'].text.update()
 
@@ -65,16 +65,8 @@ class Settings(Scene):
 			button.update(page.game.mousepos)
 		
 		page.inputbox['music'].update(page.game.mousepos)
+		page.inputbox['redeem'].update(page.game.mousepos)
 		page.inputbox['reset'].update(page.game.mousepos)
-
-		if page.inputbox['redeem'].rect.collidepoint(page.game.mousepos):
-			if page.inputbox['redeem'].box['boarderSize'] != 3:
-				page.inputbox['redeem'].box['boarderSize'] = 3
-				page.inputbox['redeem'].renderBox(True)
-		else:
-			if page.inputbox['redeem'].box['boarderSize'] != 0:
-				page.inputbox['redeem'].box['boarderSize'] = 0
-				page.inputbox['redeem'].renderBox(True)
 
 	def draw(page):
 		page.game.screen.blit(page.bg,(0,0))

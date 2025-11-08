@@ -218,18 +218,18 @@ class CoolTextBox(Interactable):
 		elif self.focus and event.type == pygame.KEYDOWN:
 			match pygame.key.name(event.key):
 				case 'backspace':
-					if len(self.text['string'])>0:
-						self.text['string'] = self.text['string'][:-1]
-						self.renderText()
+					if len(self.text.text)>0:
+						self.text.text = self.text.text[:-1]
+						self.text.update()
 				case 'return':
 					if self.callback:
 						self.callback()
-					self.text['string']=''
-					self.renderText()
+					self.text.text=''
+					self.text.update()
 				case _:
 					if event.unicode:
-						self.text['string'] += event.unicode
-						self.renderText()
+						self.text.text += event.unicode
+						self.text.update()
 
 def renderTextWithLines(text,textColor=(0,0,0),size=24,anti_alias=True,horizontal_align='Middle'):
 	thefont = pygame.font.SysFont(None, size)
@@ -258,11 +258,6 @@ def renderTextWithLines(text,textColor=(0,0,0),size=24,anti_alias=True,horizonta
 			text_render_y += height+newlineOffY
 	
 	return text_surface
-
-def make_colorsurface(size,color):
-	sf = pygame.Surface(size)
-	sf.fill(color)
-	return sf
 
 def RGBtoHSV(r,g,b):
 	r0,g0,b0 = r/255,g/255,b/255
