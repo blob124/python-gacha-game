@@ -21,16 +21,16 @@ class Archive(Scene):
 				 		1:page.buttons}
 
 		page.buttons['buttonname'] = SimpleButton(pygame.Rect(50,520,100,50),
-			[TextBox(pygame.Rect(0,0,100,50),bgcolor=(0,255,0),text='TEXT HERE',textcolor=(247,13,26),aligncenter=True)],
-			[TextBox(pygame.Rect(0,0,100,50),bgcolor=(0,190,0),text='HOVERING',textcolor=(247,13,26),aligncenter=True)]
+			[TextBox(Box(pygame.Rect(0,0,100,50),(0,255,0)),Text('TEXT HERE',textcolor=(247,13,26)))],
+			[TextBox(Box(pygame.Rect(0,0,100,50),(0,190,0)),Text('HOVERING',textcolor=(247,13,26),textsize=18))]
 		)
 
 		page.buttons['alsobuttonname'] = SimpleButton(pygame.Rect(170,520,100,50),
-			[TextBox(pygame.Rect(0,0,100,50),bgcolor=(0,190,255),text='TEXT HERE\n2',textcolor=(247,13,26),aligncenter=True)],
-			[TextBox(pygame.Rect(0,0,100,50),bgcolor=(0,144,190),text='HOVERINGING',textcolor=(247,13,26),textsize=18,aligncenter=True)]
+			[TextBox(Box(pygame.Rect(0,0,100,50),(0,190,255)),Text('TEXT HERE\n2',textcolor=(247,13,26)))],
+			[TextBox(Box(pygame.Rect(0,0,100,50),(0,144,190)),Text('HOVERINGING',textcolor=(247,13,26),textsize=18))]
 		)
 		
-		page.images['charlist'] = TextBox(pygame.Rect(50,75,100,50),bgcolor=(255,255,255,255),text='',textsize=28,aligncenter=False)
+		page.images['charlist'] = TextBox(Box(pygame.Rect(50,75,100,50),bgcolor=(255,255,255,255)),Text('',28),aligncenter=False)
 
 	def enter(page):
 		char_0_icon = page.game.data['King Rabit'].getIcon(bg=True)
@@ -40,7 +40,8 @@ class Archive(Scene):
 		page.char_arts['image1'] = Image(char_0_art,(650,75))
 		
 		#for demo
-		page.images['charlist'].text['sprite'] = renderTextWithLines(f'{'\n'.join([f'{char}:{' '*max(0,round(2.5*(12-len(str(char)+':'+str(dup)))))}{dup}' for char,dup in page.game.char_obtained.items()])}',size=28,horizontal_align='left')
+		page.images['charlist'].text.sprite = renderTextWithLines(f'{'\n'.join([f'{char}:{' '*max(0,round(2.5*(12-len(str(char)+':'+str(dup)))))}{dup}' for char,dup in page.game.char_obtained.items()])}',size=28,horizontal_align='left')
+		page.images['charlist'].text.rect = page.images['charlist'].text.sprite.get_rect()
 		page.images['charlist'].resize_fit(padding=5)
 
 	def handle_events(page, events):

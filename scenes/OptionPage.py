@@ -20,28 +20,28 @@ class Settings(Scene):
 				 		1:page.inputbox,
 				 		2:page.buttons}
 		
-		page.label['music'] = TextBox(pygame.Rect(250,150,10,10),text='Music',textsize=48).resize_fit()
-		page.label['redeem'] = TextBox(pygame.Rect(250,250,10,10),text='Redeem Code',textsize=48).resize_fit()
-		page.label['reset'] = TextBox(pygame.Rect(250,350,10,10),text='Reset',textsize=48).resize_fit()
+		page.label['music'] = Text(text='Music',textsize=48).update((250,150))
+		page.label['redeem'] = Text(text='Redeem Code',textsize=48).update((250,250))
+		page.label['reset'] = Text(text='Reset',textsize=48).update((250,350))
 
 		page.inputbox['music'] = Interactable((600,150),
 			[pygame.Rect(4,4,32,32),Image(pygame.image.load(f'data/images/checkbox_0.png').convert_alpha(),(0,0))],
 			[pygame.Rect(4,4,32,32),Image(pygame.image.load(f'data/images/checkbox_0.png').convert_alpha(),(0,0))],
 			[pygame.Rect(4,4,32,32),Image(pygame.image.load(f'data/images/checkbox_1.png').convert_alpha(),(0,0))],
 			[pygame.Rect(4,4,32,32),Image(pygame.image.load(f'data/images/checkbox_1.png').convert_alpha(),(0,0))],
-			callback=lambda: (toggle_music(page.game), setattr(page.inputbox['music'], 'state', 1 if page.game.musicplaying else 0))
+			callback=lambda: (page.game.toggle_music(), setattr(page.inputbox['music'], 'state', 1 if page.game.musicplaying else 0))
 		)
 		page.inputbox['music'].state = 1
 
-		page.inputbox['redeem'] = TextBox(pygame.Rect(600,250,400,40),bgcolor=(255,255,255),text='defaultText')
-		page.inputbox['redeem'].text['string'] = 'Hi pookie!!'
-		page.inputbox['redeem'].renderText(True)
+		page.inputbox['redeem'] = CoolTextBox(Box(pygame.Rect(600,250,400,40),bgcolor=(255,255,255)),Text('defaultText'),callback=lambda txtbx: enterCode(txtbx.text.text))
+		page.inputbox['redeem'].text.text = 'Hi pookie!!'
+		page.inputbox['redeem'].text.update()
 
 		page.inputbox['reset'] = SimpleButton(pygame.Rect(600,350,100,50),
-			[TextBox(pygame.Rect(0,0,100,50),bgcolor=(128,128,160),text='Reset',textcolor=(247,13,26),aligncenter=True)],
-			[TextBox(pygame.Rect(0,0,100,50),bgcolor=(78,78,97),text='Reset',textcolor=(247,13,26),aligncenter=True)],
-			[TextBox(pygame.Rect(0,0,100,50),bgcolor=(255,0,0),text='ARE YOU\nSURE?',textcolor=(0,0,0),textsize=24,aligncenter=True)],
-			[TextBox(pygame.Rect(0,0,100,50),bgcolor=(190,0,0),text='ARE YOU\nSURE?',textcolor=(0,0,0),textsize=24,aligncenter=True)],
+			[TextBox(Box(pygame.Rect(0,0,100,50),bgcolor=(128,128,160)),Text('Reset',textcolor=(247,13,26)))],
+			[TextBox(Box(pygame.Rect(0,0,100,50),bgcolor=(78,78,97)),Text('Reset',textcolor=(247,13,26)))],
+			[TextBox(Box(pygame.Rect(0,0,100,50),bgcolor=(255,0,0)),Text('ARE YOU\nSURE?',textcolor=(0,0,0),textsize=24))],
+			[TextBox(Box(pygame.Rect(0,0,100,50),bgcolor=(190,0,0)),Text('ARE YOU\nSURE?',textcolor=(0,0,0),textsize=24))],
 			callback=lambda: (page.game.reset_profile() if page.inputbox['reset'].state==1 else None, setattr(page.inputbox['reset'], 'state', 0 if page.inputbox['reset'].state==1 else 1))
 		)
 
@@ -82,3 +82,7 @@ class Settings(Scene):
 		for _,group in sorted(page.groups.items()):
 			for _,obj in group.items():
 				obj.draw(page.game.screen)
+
+def enterCode(code):
+	if code == 'NOTAGAME':
+		pass

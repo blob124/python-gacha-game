@@ -67,63 +67,77 @@ class Image(pygame.sprite.Sprite):
 		toblit = self.sprite if not grayscale else self.get_grayscale()
 		screen.blit(toblit, self.rect)
 
-class TextBox:
-	def __init__(self, rect, bgcolor=(0,0,0,0), boardcolor=(0,0,0), boardsize=0, text='', textsize=24, textcolor=(0,0,0), aligncenter=False, antialias=True):
+class Box:
+	def __init__(self, rect, bgcolor=(0,0,0,0), boardcolor=(0,0,0), boardsize=0):
 		self.rect = rect
-		self.box = {'sprite':None,'bgColor':bgcolor,'boarderColor':boardcolor,'boarderSize':boardsize}
-		self.text = {'sprite':None,'string':text,'textColor':textcolor,'textSize':textsize,'font':pygame.font.SysFont(None, textsize),'antialias':antialias}
-		self.aligncenter = aligncenter
+		self.bgColor = bgcolor
+		self.bdColor = boardcolor
+		self.bdSize = boardsize
+		self.sprite = None
 
-		self.renderBox()
-		self.renderText()
-		self.updateSprite()
-
-	def renderBox(self,update=False):
+		self.update()
+	
+	def update(self):
 		daBox = pygame.Surface(self.rect.size, flags=pygame.SRCALPHA)
-		bgColor = (list(self.box.get('bgColor'))+[255])[:4]
-		bdColor = (list(self.box.get('boarderColor'))+[255])[:4]
-		bdSize = self.box.get('boarderSize')
+		bgColor = (list(self.bgColor)+[255])[:4]
+		bdColor = (list(self.bdColor)+[255])[:4]
+		bdSize = self.bdSize
 		if bdSize >= min(self.rect.size):
 			daBox.fill(bdColor)
 		else:
 			daBox.fill(bgColor)
 			if bdSize > 0:
 				pygame.draw.rect(daBox,bdColor[:3],(0,0,self.rect.w,self.rect.h),bdSize)
-		self.box['sprite'] = daBox
-		if update:
-			self.updateSprite()
+		self.sprite = daBox
+
+	def draw(self, screen):
+		screen.blit(self.sprite, self.rect)
+
+class Text:
+	def __init__(self, text='', textsize=24, textcolor=(0,0,0), antialias=True):
+		self.text = text
+		self.textSize = textsize
+		self.textColor = textcolor
+		self.antialias = antialias
+
+		self.update((0,0))
 	
-	def renderText(self,update=False):
-		textString = self.text.get('string')
-		textColor = self.text.get('textColor')
-		textSize = self.text.get('textSize')
-		textFont = self.text.get('font')
-		antiAlias = self.text.get('antialias')
-		self.text['sprite'] = renderTextWithLines(textString,textColor,textSize,textFont,antiAlias)
-		if update:
-			self.updateSprite()
-	
-	def updateSprite(self):
-		self.sprite = pygame.Surface(self.rect.size, flags=pygame.SRCALPHA)
-		sprBox = self.box.get('sprite')
-		sprText = self.text.get('sprite')
-		self.sprite.blit(sprBox,(0,0))
-		if self.aligncenter:
-			self.sprite.blit(sprText,(self.rect.w/2-sprText.get_width()/2,self.rect.h/2-sprText.get_height()/2))
-		else:
-			padding = 5
-			self.sprite.blit(sprText,(padding,self.rect.h/2-sprText.get_height()/2))
-	
-	def resize_fit(self,padding=0):
-		old_topleft = self.rect.topleft
-		self.rect = self.text['sprite'].get_rect().inflate(padding*2,padding*2)
-		self.rect.topleft = old_topleft
-		self.aligncenter = True
-		self.renderBox(update=True)
+	def update(self,xy=None):
+		if xy is None:
+			xy=self.rect.topleft
+		self.sprite = renderTextWithLines(self.text,self.textColor,self.textSize,self.antialias)
+		self.rect = self.sprite.get_rect(topleft=xy)
 		return self
 
 	def draw(self, screen):
 		screen.blit(self.sprite, self.rect)
+
+class TextBox:
+	def __init__(self, box, text, aligncenter=True):
+		self.box = box
+		self.text = text
+		self.aligncenter = aligncenter
+		self.update()
+	
+	def update(self):
+		self.sprite = self.box.sprite.copy()
+		if self.aligncenter:
+			self.sprite.blit(self.text.sprite,(self.box.rect.w/2-self.text.rect.w/2,self.box.rect.h/2-self.text.rect.h/2))
+		else:
+			padding = 5
+			self.sprite.blit(self.text.sprite,(padding,self.box.rect.h/2-self.text.rect.h/2))
+
+	def resize_fit(self,padding=0):
+		new_rect = self.text.rect.inflate(padding*2,padding*2)
+		self.box.rect.width = new_rect.width
+		self.box.rect.height = new_rect.height
+		self.aligncenter = True
+		self.box.update()
+		self.update()
+		return self
+	
+	def draw(self, screen):
+		screen.blit(self.sprite, self.box.rect)
 
 class Interactable:
 	def __init__(self,xy,*states, callback=None):
@@ -164,7 +178,60 @@ class SimpleButton(Interactable):
 		"""
 		super().__init__(rect.topleft,*[[pygame.Rect(0,0,rect.w,rect.h),*sprite] for sprite in sprites],callback=callback)
 
-def renderTextWithLines(text,textColor=(0,0,0),size=24,font=pygame.font.SysFont(None, 24),anti_alias=True,horizontal_align='Middle'):
+class CoolTextBox(Interactable):
+	def __init__(self, box, text, callback=None):
+		self.BLINK_EVENT = pygame.USEREVENT + 1
+		pygame.time.set_timer(self.BLINK_EVENT, 545)
+
+		super().__init__(box.rect.topleft,
+			[pygame.Rect(0,0,box.rect.w,box.rect.h),Box(box.rect,box.bgColor,box.bdColor,0)],
+			[pygame.Rect(0,0,box.rect.w,box.rect.h),Box(box.rect,box.bgColor,box.bdColor,2)],
+			[pygame.Rect(0,0,box.rect.w,box.rect.h),Box(box.rect,box.bgColor,box.bdColor,3)],
+			[pygame.Rect(0,0,box.rect.w,box.rect.h),Box(box.rect,box.bgColor,box.bdColor,3)]
+		)
+		self.focus = False
+		self.hovered = False
+		self.textcursorvisible = True
+
+		self.callback = callback
+
+		self.text = text
+	
+	def update(self, mouse_pos):
+		self.hovered = self.curState()['hitbox'].move(self.x,self.y).collidepoint(mouse_pos)
+		padding = 5
+		self.text.update((self.x+padding, self.y+self.curState()['sprite'].rect.h/2-self.text.rect.h/2))
+
+	def draw(self, screen):
+		screen.blit(self.curState()['sprite'].sprite, (self.x,self.y))
+		screen.blit(self.text.sprite, self.text.rect)
+		if self.textcursorvisible:
+			pygame.draw.line(screen, self.text.textColor, (self.text.rect.right+1,self.text.rect.top-5), (self.text.rect.right+1,self.text.rect.bottom+1), 1)
+	
+	def handle_event(self, event):
+		if event.type == self.BLINK_EVENT:
+			self.textcursorvisible = not self.textcursorvisible
+		elif event.type == pygame.MOUSEBUTTONDOWN and event.button == 1 and self.hovered:
+			self.focus = not self.focus
+			self.state = 1 if self.focus else 0
+			self.textcursorvisible = True
+		elif self.focus and event.type == pygame.KEYDOWN:
+			match pygame.key.name(event.key):
+				case 'backspace':
+					if len(self.text['string'])>0:
+						self.text['string'] = self.text['string'][:-1]
+						self.renderText()
+				case 'return':
+					if self.callback:
+						self.callback()
+					self.text['string']=''
+					self.renderText()
+				case _:
+					if event.unicode:
+						self.text['string'] += event.unicode
+						self.renderText()
+
+def renderTextWithLines(text,textColor=(0,0,0),size=24,anti_alias=True,horizontal_align='Middle'):
 	thefont = pygame.font.SysFont(None, size)
 	antialias = anti_alias
 	if '\n' not in text:
@@ -191,15 +258,6 @@ def renderTextWithLines(text,textColor=(0,0,0),size=24,font=pygame.font.SysFont(
 			text_render_y += height+newlineOffY
 	
 	return text_surface
-
-def toggle_music(game):
-	if game.musicplaying:
-		game.musicplaying = False
-		pygame.mixer.music.pause()
-		pygame.mixer.music.set_pos(0)
-	else:
-		game.musicplaying = True
-		pygame.mixer.music.unpause()
 
 def make_colorsurface(size,color):
 	sf = pygame.Surface(size)

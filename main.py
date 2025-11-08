@@ -97,11 +97,20 @@ class Game:
 		else:
 			game.char_obtained[charname] += amount
 	
-	def reset_profile(self):
+	def reset_profile(game):
 		game.char_obtained = {}
 		game.party = ['','','','','']
 		game.currency = 6700
 		game.saveData()
+	
+	def toggle_music(game):
+		if game.musicplaying:
+			game.musicplaying = False
+			pygame.mixer.music.pause()
+			pygame.mixer.music.set_pos(0)
+		else:
+			game.musicplaying = True
+			pygame.mixer.music.unpause()
 
 	def change_scene(game, new_scene):
 		game.scene = game.scenes[new_scene]
