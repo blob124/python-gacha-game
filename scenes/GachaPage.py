@@ -2,7 +2,10 @@ import pygame
 import random
 import math
 from stuff import *
+import json
 
+PATH_BANNERS = 'data/banners.json'
+PATH_BANNERFOLDER = 'data/images/banners/'
 class GachaPlace(Scene):
 	def __init__(page,game):
 		page.game = game
@@ -21,18 +24,13 @@ class GachaPlace(Scene):
 		page.justroll = []
 		page.displayroll = False
 
-		page.banners = [
-			page.Banner(page.game.data,'military','Bnuuy Recruit',
-				('Unnamed04','Unnamed03','Unnamed02'),
-				[10,30,50,9.4,0.6],price=160,bg=Box(page.game.screen.get_rect(),(100,130,30)).sprite),
-			page.Banner(page.game.data,'politician','Politic Hare',
-				('King Rabit','Unnamed04'),
-				[10,30,50,9.4,0.6],price=120,bg=Box(page.game.screen.get_rect(),(30,100,130)).sprite),
-			page.Banner(page.game.data,'student','Rabit Education',
-				('Unnamed05',),
-				[10,30,50,9.4,0.6],price=80,bg=Box(page.game.screen.get_rect(),(130,100,130)).sprite)
-		]
+		page.banners = []
 		page.currentbanner = 0
+		with open(PATH_BANNERS,'r') as f:
+			banners = json.load(f)
+			for banner in banners:
+				page.banners.append(page.Banner(page,banner))
+
 
 		page.ui['kurenzy'] = TextBox(Box(pygame.Rect(0,40,100,50),bgcolor=(255,255,255,255)),Text(f'kurenzy: {page.game.currency}',textsize=28)).resize_fit(padding=5)
 
@@ -127,7 +125,7 @@ class GachaPlace(Scene):
 		page.reload_currency(-rolls*page.currentBanner().price)
 		for _ in range(rolls):
 			daroll = page.currentBanner().singleroll()
-			page.game.increase_char_obtain(daroll.name)
+			page.game.increase_char_obtain(daroll.id)
 			page.justroll.append(daroll)
 		page.displayroll = True
 	
@@ -149,17 +147,21 @@ class GachaPlace(Scene):
 			btn.state = page.currentbanner
 
 	class Banner:
-		def __init__(self,gamechar,id,name,charlist,dropRateByRarity,price,bg):
-			self.id = id
-			self.name = name
-			self.banner_by_rank = {rank+1:(dr,[]) for rank,dr in enumerate(dropRateByRarity)}
-			self.price = price
-			for charname in charlist:
-				char = gamechar[charname]
+		def __init__(self,page,banner):
+			self.id = banner['id']
+			self.name = banner['name']
+			self.banner_by_rank = {rank+1:(dr,[]) for rank,dr in enumerate(banner['chance'])}
+			self.price = banner['price']
+			for charid in banner['list']:
+				char = page.game.data[charid]
 				if char.rarity in self.banner_by_rank:
 					self.banner_by_rank[char.rarity][1].append(char)
 
-			self.bg = bg
+			try:
+				self.bg = pygame.transform.scale(pygame.image.load(PATH_BANNERFOLDER+banner['img']).convert_alpha(), page.game.screen.get_size())
+			except:
+				self.bg = pygame.surface(page.game.screen.get_size())
+
 			self.bg.blit(Text(self.id,antialias=False).sprite,(0,0))
 
 		def singleroll(self):

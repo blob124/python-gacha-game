@@ -1,0 +1,44 @@
+[
+	{
+		"id": 1,
+		"name": "King Rabit",
+		"path": "king_rabbit",
+		"rarity": 5,
+		"power": 1000
+	},
+	{
+		"id": 2,
+		"name": "Unnamed02",
+		"path": "unknownfile02",
+		"rarity": 4,
+		"power": 500
+	},
+	{
+		"id": 3,
+		"name": "Unnamed03",
+		"path": "unknownfile03",
+		"rarity": 3,
+		"power": 100
+	},
+	{
+		"id": 4,
+		"name": "Unnamed04",
+		"path": "unknownfile04",
+		"rarity": 2,
+		"power": 40
+	},
+	{
+		"id": 5,
+		"name": "Unnamed05",
+		"path": "unknownfile05",
+		"rarity": 1,
+		"power": 10
+	},
+	{
+		"id": 0,
+		"name": "PHD",
+		"path": "placeholder",
+		"rarity": 0,
+		"power": 0
+	}
+]

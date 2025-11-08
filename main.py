@@ -1,6 +1,7 @@
 import pygame
 import sys
 from pathlib import Path
+import json
 
 from scenes.GachaPage import GachaPlace
 from scenes.MissionPage import Mission
@@ -9,6 +10,10 @@ from scenes.ArchivePage import Archive
 from scenes.OptionPage import Settings
 
 from stuff import Scene
+
+PATH_CHAR_DATA = 'data/characterlist.json'
+PATH_PROFILE = 'data/profile.json'
+PATH_BANNERS = 'data/banners.json'
 
 pygame.init()
 
@@ -60,45 +65,46 @@ class Game:
 		game.char_obtained = {}
 		game.party = []
 
-		if Path('data/characterlist.txt').is_file():
-			with open('data/characterlist.txt','r') as charFile:
-				for line in charFile:
-					name,path_to_image,rarity,power = line.strip().split(',')
-					game.data[name] = Character(name,int(rarity),int(power),path_to_image)
+		if Path(PATH_CHAR_DATA).is_file():
+			with open(PATH_CHAR_DATA,'r') as f:
+				chardata = json.load(f)
+				for char in chardata:
+					game.data[char['id']] = Character(char)
 		else:
-			print('character data file not found :sad:')
+			print(f'{PATH_CHAR_DATA} not found :sad:')
 			pygame.quit()
 			sys.exit()
 
-		if Path('data/profile.txt').is_file():
-			with open('data/profile.txt','r') as f:
-				_,obtain,party,currency = f.read().strip().split('[--]')
-				for char in obtain.strip().split():
-					name,dup = char.split('=')
-					game.char_obtained[name] = int(dup)
+		if Path(PATH_PROFILE).is_file():
+			with open(PATH_PROFILE,'r') as f:
+				profile = json.load(f)
+				for id,dup in profile['obtained'].items():
+					game.char_obtained[int(id)] = dup
 
-				game.party = party.strip().split(',')
-				game.currency = int(currency.strip())
+				game.party = profile['team']
+				game.currency = profile['currency']
 		else:
-			print('something error')
+			print(f'{PATH_PROFILE} err something error')
 			pygame.quit()
 			sys.exit()
 	
 	def saveData(game):
-		with open('data/profile.txt','w') as f:
-			obtain = '\n'.join([f'{char}={dup}' for char,dup in game.char_obtained.items()])
-			party = ','.join(game.party)
-			currency = game.currency
-			f.writelines(f'[--]\n{obtain}\n[--]\n{party}\n[--]\n{currency}')
+		with open(PATH_PROFILE,'w') as f:
+			data = {
+				"obtained": game.char_obtained,
+				"team": game.party,
+				"currency": game.currency
+			}
+			json.dump(data, f, indent='\t')
 	
-	def increase_char_obtain(game,charname,amount=1):
-		if charname not in game.char_obtained:
-			game.char_obtained[charname] = amount
+	def increase_char_obtain(game,charid,amount=1):
+		if charid not in game.char_obtained:
+			game.char_obtained[charid] = amount
 		else:
-			game.char_obtained[charname] += amount
+			game.char_obtained[charid] += amount
 	
 	def reset_profile(game):
-		game.char_obtained = {}
+		game.char_obtained = {'0':0}
 		game.party = ['','','','','']
 		game.currency = 6700
 		game.saveData()
@@ -118,12 +124,13 @@ class Game:
 
 RANK_COLOR = [(124,142,161),(100,156,128),(91,150,186),(160,119,201),(204,152,88)]
 class Character:
-	def __init__(self, name, rarity, power, image_path):
-		self.name = name
-		self.rarity = rarity
-		self.power = power
+	def __init__(self, char):
+		self.id = char['id']
+		self.name = char['name']
+		self.rarity = char['rarity']
+		self.power = char['power']
+		self.imgpath = char['path']
 
-		self.imgpath = image_path
 		self.imgIcon = None
 		self.imgArt = None
 	
