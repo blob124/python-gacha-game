@@ -12,6 +12,10 @@ class Archive(Scene):
 		page.bg.fill((30,100,30))
 		page.bg.blit(EXITTXT,(20,20))
 
+		page.char_image_table = {}
+		for id,char in page.game.data.items():
+			page.char_image_table[id] = (Image(char.getIcon(bg=True),(0,0)),Image(char.getArt(),(600,50)))
+
 		page.images = {}
 		page.char_icons = {}
 		page.char_display = {}
@@ -27,9 +31,15 @@ class Archive(Scene):
 		for id,char in page.game.data.items():
 			if id==0:
 				continue
+			obtained = (page.game.char_obtained.get(id) or 0)>0
 			r,c = ii//cmax,ii%cmax
-			page.char_icons[id] = Image(char.getIcon(bg=True),(50+(80+10)*ii,75))
-			page.char_icons[id].drawgrayscale = not (page.game.char_obtained.get(id) or 0)>0
+			page.char_image_table[id][0].rect.topleft = (50+(80+10)*ii,75)
+			page.char_image_table[id][0].drawgrayscale = not obtained
+
+			page.char_image_table[id][1].rect.topleft = (600,50)
+			page.char_image_table[id][1].drawgrayscale = not obtained
+
+			page.char_icons[id] = page.char_image_table[id][0]
 			ii+=1
 
 		page.updateDisplay(page.game.data[1])
@@ -57,11 +67,19 @@ class Archive(Scene):
 	def updateDisplay(page,char):
 		page.currentcharacter = char
 		if char != None:
-			page.char_display['art'] = Image(char.getArt(),(600,50))
-			page.char_display['label'] = TextBox(
-				Image(DISPLAY_LABEL_SURFACE.sprite, (680,500)),
-				Text(f'{char.name}\n{char.rarity}\n{char.power}\n{page.game.char_obtained.get(char.id) or 0}',align='right'),align='right'
-			)
+			obtained = (page.game.char_obtained.get(char.id) or 0)>0
+			if obtained:
+				page.char_display['art'] = page.char_image_table[char.id][1]
+				page.char_display['label'] = TextBox(
+					Image(DISPLAY_LABEL_SURFACE.sprite, (680,500)),
+					Text(f'{char.name}\n{char.rarity}\n{char.power}\n{page.game.char_obtained.get(char.id) or 0}',align='right'),align='right'
+				)
+			else:
+				page.char_display['art'] = page.char_image_table[char.id][1]
+				page.char_display['label'] = TextBox(
+					Image(DISPLAY_LABEL_SURFACE.sprite, (680,500)),
+					Text(f'???\n???\n???\n0',align='right'),align='right'
+				)
 		else:
 			page.char_display['art'] = Image(BLANK_SURFACE,(600,50))
 			page.char_display['label'] = TextBox(
