@@ -154,7 +154,7 @@ class Character:
 	def getArt(self):
 		art = self.imgArt
 		if art is None:
-			artX, artY = 400,460
+			artX, artY = 400,450
 			if Path(f'data/images/characters/{self.imgpath}_art.png').is_file():
 				art = pygame.transform.scale(pygame.image.load(f'data/images/characters/{self.imgpath}_art.png').convert_alpha(), (artX, artY))
 				self.imgArt = art
