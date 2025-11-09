@@ -120,6 +120,8 @@ class GachaPlace(Scene):
 			for i,char in enumerate(page.justroll):
 				r,c = i//cmax,i%cmax
 				page.game.screen.blit(char.getIcon(bg=True), (page.game.screen.get_width()/2-40+(c-2)*120,200+r*100))
+			
+			TextBox(Box(pygame.Rect(page.game.screen.get_width()/2-65,400,130,40),(225,225,225)),Text(f'worth: {sum([char.power for char in page.justroll])}',32,(225,130,0))).draw(page.game.screen)
 
 	def roll(page,rolls=1):
 		page.reload_currency(-rolls*page.currentBanner().price)
