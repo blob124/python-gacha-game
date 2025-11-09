@@ -13,10 +13,10 @@ class Archive(Scene):
 
 		page.images = {}
 		page.char_icons = {}
-		page.char_arts = {}
+		page.char_display = {}
 		page.buttons = {}
 		page.groups = {	-2:page.char_icons,
-				 		-1:page.char_arts,
+				 		-1:page.char_display,
 						0:page.images,
 				 		1:page.buttons}
 
@@ -30,17 +30,33 @@ class Archive(Scene):
 			[TextBox(Box(pygame.Rect(0,0,100,50),(0,144,190)),Text('HOVERINGING',textcolor=(247,13,26),textsize=18))]
 		)
 		
-		page.images['charlist'] = TextBox(Box(pygame.Rect(50,75,100,50),bgcolor=(255,255,255,255)),Text('',28),aligncenter=False)
+		page.images['charlist'] = TextBox(Box(pygame.Rect(50,75,100,50),bgcolor=(255,255,255,255)),Text('',28),align='left')
 
 	def enter(page):
-		char_0_icon = page.game.data['King Rabit'].getIcon(bg=True)
-		char_0_art = page.game.data['King Rabit'].getArt()
+		page.currentcharacter = page.game.data[1]
+		char_0_icon = page.currentcharacter.getIcon(bg=True)
 
-		page.char_icons['image0'] = Image(char_0_icon,(50,75))
-		page.char_arts['image1'] = Image(char_0_art,(650,75))
+		for i in range(5):
+			page.char_icons[f'image{i}'] = Image(char_0_icon,(50+90*i,75))
+
+		page.char_display['art'] = Image(page.currentcharacter.getArt(),(650,50))
+		page.char_display['label-left'] = TextBox(
+			Box(pygame.Rect(725,500,250,80),(255,255,255)),
+			Text(f'Name:\nRank:\nPower Level:\nNumbers:',align='left'),align='left'
+		)
+		page.char_display['label-right'] = TextBox(
+			Box(pygame.Rect(725,500,250,80),(0,0,0,0)),
+			Text(f'{page.currentcharacter.name}\n{page.currentcharacter.rarity}\n{page.currentcharacter.power}\n{page.game.char_obtained.get(page.currentcharacter.id) or 0}',align='right'),align='right'
+		)
+		#page.char_display['name'] = Image(Text(page.currentcharacter.name).sprite,(650,500))
+		#page.char_display['rarity'] = Image(Text(page.currentcharacter.rarity).sprite,(800,500))
+		#page.char_display['power'] = Image(Text(page.currentcharacter.power).sprite,(650,550))
+		#page.char_display['dup'] = Image(Text(page.game.char_obtained.get(page.currentcharacter.id) or 0).sprite,(800,550))
+
+		
 		
 		#for demo
-		page.images['charlist'].text.sprite = renderTextWithLines(f'{'\n'.join([f'{char}:{' '*max(0,round(2.5*(12-len(str(char)+':'+str(dup)))))}{dup}' for char,dup in page.game.char_obtained.items()])}',size=28,horizontal_align='left')
+		page.images['charlist'].text.sprite = renderTextWithLines(f'{'\n'.join([f'{page.game.data[charid].name}:{' '*max(0,round(2.5*(12-len(str(page.game.data[charid].name)+':'+str(dup)))))}{dup}' for charid,dup in page.game.char_obtained.items()])}',size=28,horizontal_align='left')
 		page.images['charlist'].text.rect = page.images['charlist'].text.sprite.get_rect()
 		page.images['charlist'].resize_fit(padding=5)
 
