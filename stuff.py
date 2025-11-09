@@ -1,11 +1,14 @@
 import pygame
+import numpy as np
+
+import typing
 
 pygame.init()
 
 EXITTXT = pygame.font.SysFont(None, 24).render('Press Esc, it stands for Escape!', True, (255, 255, 255))
 
 class Scene:
-	def __init__(page,game):
+	def __init__(page, game):
 		page.game = game
 
 		page.bg = pygame.Surface(page.game.screen.get_size())
@@ -42,7 +45,7 @@ class Scene:
 				obj.draw(page.game.screen)
 
 class Image(pygame.sprite.Sprite):
-	def __init__(self,image,topleft):
+	def __init__(self, image:pygame.Surface, topleft:tuple[float,float]):
 		super().__init__()
 		self.sprite = image
 		self.rect = self.sprite.get_rect(topleft=topleft)
@@ -54,15 +57,7 @@ class Image(pygame.sprite.Sprite):
 
 	def get_grayscale(self):
 		if self.spriteButGray is None:
-			width,height = self.sprite.get_size()
-			self.spriteButGray = pygame.Surface((width, height),flags=pygame.SRCALPHA)
-			pixelBG = self.sprite.get_at((0,0))[:3]
-			for x in range(width):
-				for y in range(height):
-					r,g,b,*_ = self.sprite.get_at((x,y))
-					h,s,v = RGBtoHSV(r,g,b)
-					r0,g0,b0 = HSVtoRGB(0,0,v)
-					self.spriteButGray.set_at((x,y), (r0,g0,b0))
+			self.spriteButGray = to_grayscale(self.sprite)
 		return self.spriteButGray
 	
 	def draw(self, screen):
@@ -70,7 +65,7 @@ class Image(pygame.sprite.Sprite):
 		screen.blit(toblit, self.rect)
 
 class Box:
-	def __init__(self, rect, bgcolor=(0,0,0,0), boardcolor=(0,0,0), boardsize=0):
+	def __init__(self, rect:pygame.Rect, bgcolor:tuple[int,...]=(0,0,0,0), boardcolor:tuple[int,...]=(0,0,0), boardsize=0):
 		self.rect = rect
 		self.bgColor = bgcolor
 		self.bdColor = boardcolor
@@ -96,7 +91,7 @@ class Box:
 		screen.blit(self.sprite, self.rect)
 
 class Text:
-	def __init__(self, text='', textsize=24, textcolor=(0,0,0), antialias=True, align='middle'):
+	def __init__(self, text='', textsize=24, textcolor:tuple[int,...]=(0,0,0), antialias=True, align: typing.Literal['left','middle','right']='middle'):
 		self.text = str(text)
 		self.textSize = textsize
 		self.textColor = textcolor
@@ -105,7 +100,7 @@ class Text:
 
 		self.update((0,0))
 	
-	def update(self,xy=None):
+	def update(self,xy:tuple[float,float]=None):
 		if xy is None:
 			xy=self.rect.topleft
 		self.sprite = renderTextWithLines(self.text,self.textColor,self.textSize,self.antialias,self.align)
@@ -116,7 +111,7 @@ class Text:
 		screen.blit(self.sprite, self.rect)
 
 class TextBox:
-	def __init__(self, box, text, align='middle'):
+	def __init__(self, box:Box|Image, text:Text, align:typing.Literal['left','middle','right']='middle'):
 		self.box = box
 		self.text = text
 		self.align = align
@@ -147,7 +142,7 @@ class TextBox:
 		screen.blit(self.sprite, self.box.rect)
 
 class Interactable:
-	def __init__(self,xy,*states, callback=None):
+	def __init__(self, xy:tuple[float, float], *states:list[pygame.Rect|pygame.Surface], callback=None):
 		"""---
 		xy: (x,y)\n
 		states: state0, state1, ...\n
@@ -177,16 +172,11 @@ class Interactable:
 				self.callback()
 
 class SimpleButton(Interactable):
-	def __init__(self,rect,*sprites, callback=None):
-		"""---
-		rect: pygame.Rect(x,y,width,height)\n
-		sprites: state0, state1, ...\n
-		sprite: [imageSurface]
-		"""
+	def __init__(self, rect:pygame.Rect, *sprites:list[pygame.Surface], callback=None):
 		super().__init__(rect.topleft,*[[pygame.Rect(0,0,rect.w,rect.h),*sprite] for sprite in sprites],callback=callback)
 
 class CoolTextBox(Interactable):
-	def __init__(self, box, text, callback=None):
+	def __init__(self, box:Box|Image, text:Text, callback=None):
 		self.BLINK_EVENT = pygame.USEREVENT + 1
 		pygame.time.set_timer(self.BLINK_EVENT, 545)
 
@@ -238,7 +228,7 @@ class CoolTextBox(Interactable):
 						self.text.text += event.unicode
 						self.text.update()
 
-def renderTextWithLines(text,textColor=(0,0,0),size=24,anti_alias=True,horizontal_align='Middle'):
+def renderTextWithLines(text:str,textColor:tuple[int,...]=(0,0,0),size=24,anti_alias=True, align:typing.Literal['left','middle','right']='middle') -> pygame.Surface:
 	thefont = pygame.font.SysFont(None, size)
 	antialias = anti_alias
 	if '\n' not in text:
@@ -254,52 +244,38 @@ def renderTextWithLines(text,textColor=(0,0,0),size=24,anti_alias=True,horizonta
 
 		text_render_y = 0
 		for minitext,(width,height) in text_render.items():
-			match(horizontal_align.lower()):
+			match(align.lower()):
+				case 'left':
+					text_render_x = 0
 				case 'middle':
 					text_render_x = text_render_width/2-width/2
-				case 'right':
-					text_render_x = text_render_width-width
 				case _:
-					text_render_x = 0
+					text_render_x = text_render_width-width
 			text_surface.blit(minitext, (text_render_x, text_render_y))
 			text_render_y += height+newlineOffY
 	
 	return text_surface
 
-def RGBtoHSV(r,g,b):
-	r0,g0,b0 = r/255,g/255,b/255
-	cMax = max(r0,g0,b0)
-	cMin = min(r0,b0,g0)
-	delta = cMax-cMin
-	if delta==0:
-		h = 0
-	elif cMax==r0:
-		h = 60*((g0-b0)/delta)%6
-	elif cMax==g0:
-		h = 60*((b0-r0)/delta+2)%6
-	elif cMax==b0:
-		h = 60*((r0-g0)/delta+4)%6
-	
-	s = 0 if cMax==0 else delta/cMax
-	v = cMax
-	return h,s,v
+def to_grayscale(surface: pygame.Surface) -> pygame.Surface:
+    """
+    Convert a Pygame surface to grayscale.
+    Preserves alpha transparency if present.
+    """
+    # Handle alpha
+    has_alpha = surface.get_flags() & pygame.SRCALPHA
 
-def HSVtoRGB(h,s,v):
-	c = v*s
-	x = c*(1-abs((h/60)%2-1))
-	m = v-c
-	if h<60:
-		r0,g0,b0 = c,x,0
-	elif h<120:
-		r0,g0,b0 = x,c,0
-	elif h<180:
-		r0,g0,b0 = 0,c,x
-	elif h<240:
-		r0,g0,b0 = 0,x,c
-	elif h<300:
-		r0,g0,b0 = x,0,c
-	else:
-		r0,g0,b0 = c,0,x
+    # Convert to array
+    arr = pygame.surfarray.array3d(surface)
+    gray = (0.299 * arr[:, :, 0] + 0.587 * arr[:, :, 1] + 0.114 * arr[:, :, 2]).astype(np.uint8)
+    gray3d = np.stack((gray,)*3, axis=-1)
 
-	r,g,b = (r0+m)*255,(g0+m)*255,(b0+m)*255
-	return r,g,b
+    # Make grayscale surface
+    gray_surface = pygame.surfarray.make_surface(gray3d)
+
+    # If surface had transparency, copy alpha channel
+    if has_alpha:
+        alpha = pygame.surfarray.array_alpha(surface)
+        gray_surface = gray_surface.convert_alpha()
+        pygame.surfarray.pixels_alpha(gray_surface)[:] = alpha
+
+    return gray_surface
