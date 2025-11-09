@@ -94,18 +94,19 @@ class Box:
 		screen.blit(self.sprite, self.rect)
 
 class Text:
-	def __init__(self, text='', textsize=24, textcolor=(0,0,0), antialias=True):
-		self.text = text
+	def __init__(self, text='', textsize=24, textcolor=(0,0,0), antialias=True, align='middle'):
+		self.text = str(text)
 		self.textSize = textsize
 		self.textColor = textcolor
 		self.antialias = antialias
+		self.align = align
 
 		self.update((0,0))
 	
 	def update(self,xy=None):
 		if xy is None:
 			xy=self.rect.topleft
-		self.sprite = renderTextWithLines(self.text,self.textColor,self.textSize,self.antialias)
+		self.sprite = renderTextWithLines(self.text,self.textColor,self.textSize,self.antialias,self.align)
 		self.rect = self.sprite.get_rect(topleft=xy)
 		return self
 
@@ -113,19 +114,25 @@ class Text:
 		screen.blit(self.sprite, self.rect)
 
 class TextBox:
-	def __init__(self, box, text, aligncenter=True):
+	def __init__(self, box, text, align='middle'):
 		self.box = box
 		self.text = text
-		self.aligncenter = aligncenter
+		self.align = align
 		self.update()
 	
 	def update(self):
 		self.sprite = self.box.sprite.copy()
-		if self.aligncenter:
-			self.sprite.blit(self.text.sprite,(self.box.rect.w/2-self.text.rect.w/2,self.box.rect.h/2-self.text.rect.h/2))
-		else:
-			padding = 5
-			self.sprite.blit(self.text.sprite,(padding,self.box.rect.h/2-self.text.rect.h/2))
+		match self.align.lower():
+			case 'left':
+				padding = 5
+				self.sprite.blit(self.text.sprite,(padding,self.box.rect.h/2-self.text.rect.h/2))
+			case 'right':
+				padding = 5
+				self.sprite.blit(self.text.sprite,(self.box.rect.w-self.text.rect.w-padding,self.box.rect.h/2-self.text.rect.h/2))
+			case _:
+				self.sprite.blit(self.text.sprite,(self.box.rect.w/2-self.text.rect.w/2,self.box.rect.h/2-self.text.rect.h/2))
+			
+			
 
 	def resize_fit(self,padding=0):
 		new_rect = self.text.rect.inflate(padding*2,padding*2)
@@ -191,7 +198,7 @@ class CoolTextBox(Interactable):
 		)
 		self.focus = False
 		self.hovered = False
-		self.textcursorvisible = True
+		self.textcursorvisible = False
 
 		self.callback = callback
 
@@ -209,12 +216,12 @@ class CoolTextBox(Interactable):
 			pygame.draw.line(screen, self.text.textColor, (self.text.rect.right+1,self.text.rect.top-5), (self.text.rect.right+1,self.text.rect.bottom+1), 1)
 	
 	def handle_event(self, event):
-		if event.type == self.BLINK_EVENT:
+		if event.type == self.BLINK_EVENT and self.focus:
 			self.textcursorvisible = not self.textcursorvisible
 		elif event.type == pygame.MOUSEBUTTONDOWN and event.button == 1 and self.hovered:
 			self.focus = not self.focus
 			self.state = 1 if self.focus else 0
-			self.textcursorvisible = True
+			self.textcursorvisible = self.focus
 		elif self.focus and event.type == pygame.KEYDOWN:
 			match pygame.key.name(event.key):
 				case 'backspace':
