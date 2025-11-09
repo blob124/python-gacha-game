@@ -45,8 +45,10 @@ class Image(pygame.sprite.Sprite):
 	def __init__(self,image,topleft):
 		super().__init__()
 		self.sprite = image
-		self.spriteButGray = None
 		self.rect = self.sprite.get_rect(topleft=topleft)
+
+		self.drawgrayscale = False
+		self.spriteButGray = None
 		
 		#self.get_grayscale()
 
@@ -63,8 +65,8 @@ class Image(pygame.sprite.Sprite):
 					self.spriteButGray.set_at((x,y), (r0,g0,b0))
 		return self.spriteButGray
 	
-	def draw(self, screen, grayscale=False):
-		toblit = self.sprite if not grayscale else self.get_grayscale()
+	def draw(self, screen):
+		toblit = self.sprite if not self.drawgrayscale else self.get_grayscale()
 		screen.blit(toblit, self.rect)
 
 class Box:
@@ -131,8 +133,6 @@ class TextBox:
 				self.sprite.blit(self.text.sprite,(self.box.rect.w-self.text.rect.w-padding,self.box.rect.h/2-self.text.rect.h/2))
 			case _:
 				self.sprite.blit(self.text.sprite,(self.box.rect.w/2-self.text.rect.w/2,self.box.rect.h/2-self.text.rect.h/2))
-			
-			
 
 	def resize_fit(self,padding=0):
 		new_rect = self.text.rect.inflate(padding*2,padding*2)
