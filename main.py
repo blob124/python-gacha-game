@@ -126,6 +126,8 @@ class Game:
 	def enterCode(game, code):
 		if code == 'NOTAGAME':
 			game.currency += 2000
+			return 'you recieve 2000 kurenzy.'
+		return 'Invalid Code'
 
 class Character:
 	DIR = 'data/images/characters/'

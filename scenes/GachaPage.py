@@ -14,14 +14,14 @@ class GachaPlace(Scene):
 		page.images = {}
 		page.buttons = {}
 		page.ui = {}
+		page.displayroll = {}
 		page.groups = {	0:page.images,
 				 		1:page.buttons,
-						2:page.ui}
+						2:page.ui,
+						3:page.displayroll}
 		
-		page.vig = pygame.Surface(page.game.screen.get_size(), pygame.SRCALPHA)
-		page.vig.fill((0,0,0,100))
-		page.justroll = []
-		page.displayroll = False
+		page.displayroll['vig'] = VignetteLayer(page.game)
+		page.showroll = False
 
 		page.banners = []
 		page.currentbanner = 0
@@ -80,27 +80,29 @@ class GachaPlace(Scene):
 		
 	def handle_events(page, events):
 		for event in events:
-			if not page.displayroll:
-				if event.type == pygame.KEYDOWN:
-					if event.key == pygame.K_RETURN:
-						pass
-					elif event.key == pygame.K_LEFT:
-						page.changeBanner(-1)
-					elif event.key == pygame.K_RIGHT:
-						page.changeBanner(+1)
-				elif event.type == pygame.MOUSEBUTTONDOWN and event.button == 1: # detect mouseclick
-					pass		
-
-				for _,button in page.buttons.items():
-					button.handle_event(event)		
-			else:
+			if page.showroll:
 				if event.type == pygame.KEYDOWN and event.key == pygame.K_ESCAPE or event.type == pygame.MOUSEBUTTONDOWN and event.button == 1:
-					page.displayroll = False
-					page.justroll = []
+					page.showroll = False
+					for key in list(page.displayroll.keys()):
+						if key != 'vig':
+							del page.displayroll[key]
+				continue
+			if event.type == pygame.KEYDOWN:
+				if event.key == pygame.K_RETURN:
+					pass
+				elif event.key == pygame.K_LEFT:
+					page.changeBanner(-1)
+				elif event.key == pygame.K_RIGHT:
+					page.changeBanner(+1)
+			elif event.type == pygame.MOUSEBUTTONDOWN and event.button == 1: # detect mouseclick
+				pass		
+
+			for _,button in page.buttons.items():
+				button.handle_event(event)
 
 	def update(page):
 		for _,button in page.buttons.items():
-			if not page.displayroll:
+			if not page.showroll:
 				button.update(page.game.mousepos)
 			else:
 				button.hovered = False
@@ -109,33 +111,33 @@ class GachaPlace(Scene):
 		page.game.screen.blit(page.bg,(0,0))
 
 		for _,group in sorted(page.groups.items()):
-			for _,obj in group.items():
-				obj.draw(page.game.screen)
-
-		if page.displayroll:
-			page.game.screen.blit(page.vig,(0,0))
-
-			cmax=5
-			for i,char in enumerate(page.justroll):
-				r,c = i//cmax,i%cmax
-				page.game.screen.blit(char.getIcon(bg=True), (page.game.screen.get_width()/2-40+(c-2)*120,200+r*100))
+			if group is page.displayroll and not page.showroll:
+				continue
 			
-			TextBox(Box(pygame.Rect(page.game.screen.get_width()/2-65,400,130,40),(225,225,225)),Text(f'worth: {sum([char.power for char in page.justroll])}',32,(225,130,0))).draw(page.game.screen)
+			for _,obj in group.items():
+				if not page.showroll and obj is page.displayroll['vig']:
+					continue
+				obj.draw(page.game.screen)
 
 	DISPLAYROLL_CMAX = 5
 	DISPLAYROLL_TOPCENTER = (1067/2, 200)
 	def roll(page,rolls=1):
 		page.reload_currency(-rolls*page.currentBanner().price)
-		for _ in range(rolls):
-			daroll = page.currentBanner().singleroll()
-			page.game.increase_char_obtain(daroll.id)
-			page.justroll.append(daroll)
-		page.displayroll = True
+		tcx, tcy = __class__.DISPLAYROLL_TOPCENTER
+		sum_power = 0
+		for i in range(rolls):
+			chardrop = page.currentBanner().singleroll()
+			page.game.increase_char_obtain(chardrop.id)
+
+			r,c = i//__class__.DISPLAYROLL_CMAX,i%__class__.DISPLAYROLL_CMAX
+			page.displayroll[i] = Image(chardrop.getIcon(bg=True),(tcx-40+(c-2)*120,tcy+r*100))
+			sum_power += chardrop.power
+		page.displayroll['net'] = TextBox(Box(pygame.Rect(tcx-65,400,130,40),(225,225,225)),Text(f'worth: {sum_power}',32,(225,130,0)))
+		page.showroll = True
 	
 	def reload_currency(page,delta=0):
 		page.game.currency += delta
-		page.ui['kurenzy'].text.text = f'kurenzy: {page.game.currency}'
-		page.ui['kurenzy'].text.update()
+		page.ui['kurenzy'].text.update(f'kurenzy: {page.game.currency}')
 		page.ui['kurenzy'].resize_fit(padding=5)
 	
 	def currentBanner(page):

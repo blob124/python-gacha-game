@@ -98,9 +98,11 @@ class Text:
 		self.antialias = antialias
 		self.align = align
 
-		self.update((0,0))
+		self.update(xy=(0,0))
 	
-	def update(self,xy:tuple[float,float]=None):
+	def update(self,newtext=None,xy:tuple[float,float]=None):
+		if newtext is not None:
+			self.text = newtext
 		if xy is None:
 			xy=self.rect.topleft
 		self.sprite = renderTextWithLines(self.text,self.textColor,self.textSize,self.antialias,self.align)
@@ -200,7 +202,7 @@ class CoolTextBox(Interactable):
 	def update(self, mouse_pos):
 		self.hovered = self.curState()['hitbox'].move(self.x,self.y).collidepoint(mouse_pos)
 		padding = 5
-		self.text.update((self.x+padding, self.y+self.curState()['sprite'].rect.h/2-self.text.rect.h/2))
+		self.text.update(xy=(self.x+padding, self.y+self.curState()['sprite'].rect.h/2-self.text.rect.h/2))
 
 	def draw(self, screen):
 		screen.blit(self.curState()['sprite'].sprite, (self.x,self.y))
@@ -219,17 +221,18 @@ class CoolTextBox(Interactable):
 			match pygame.key.name(event.key):
 				case 'backspace':
 					if len(self.text.text)>0:
-						self.text.text = self.text.text[:-1]
-						self.text.update()
+						self.text.update(newtext=self.text.text[:-1])
 				case 'return':
 					if self.callback:
 						self.callback()
-					self.text.text=''
-					self.text.update()
+					self.text.update(newtext='')
 				case _:
 					if event.unicode:
-						self.text.text += event.unicode
-						self.text.update()
+						self.text.update(newtext=self.text.text+event.unicode)
+
+class VignetteLayer(Box):
+	def __init__(self, game, color:tuple[int,...]=(0,0,0)):
+		super().__init__(pygame.Rect(0,0,game.screen.get_width(),game.screen.get_height()), (list(color)+[100])[:4])
 
 def renderTextWithLines(text:str,textColor:tuple[int,...]=(0,0,0),size=24,anti_alias=True, align:typing.Literal['left','middle','right']='middle') -> pygame.Surface:
 	thefont = pygame.font.SysFont(None, size)
