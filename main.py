@@ -14,6 +14,7 @@ from stuff import Scene
 PATH_CHAR_DATA = 'data/characterlist.json'
 PATH_PROFILE = 'data/profile.json'
 PATH_BANNERS = 'data/banners.json'
+PATH_MUSIC = 'data/sfx/music.mp3'
 
 pygame.init()
 
@@ -24,7 +25,7 @@ class Game:
 		game.clock = pygame.time.Clock()
 
 		pygame.mixer.init()
-		pygame.mixer.music.load(f'data/sfx/music.mp3')
+		pygame.mixer.music.load(PATH_MUSIC)
 		pygame.mixer.music.set_volume(0.6)
 		pygame.mixer.music.play(-1)
 		game.musicplaying = True
@@ -122,8 +123,13 @@ class Game:
 		game.scene = game.scenes[new_scene]
 		game.scene.enter()
 
-RANK_COLOR = [(124,142,161),(100,156,128),(91,150,186),(160,119,201),(204,152,88)]
+	def enterCode(game, code):
+		if code == 'NOTAGAME':
+			game.currency += 2000
+
 class Character:
+	DIR = 'data/images/characters/'
+	RANK_COLOR = [(124,142,161),(100,156,128),(91,150,186),(160,119,201),(204,152,88)]
 	def __init__(self, char):
 		self.id = char['id']
 		self.name = char['name']
@@ -137,17 +143,17 @@ class Character:
 	def getIcon(self,bg=False):
 		icon = self.imgIcon
 		if icon is None:
-			if Path(f'data/images/characters/{self.imgpath}_icon.png').is_file():
-				icon = pygame.transform.scale(pygame.image.load(f'data/images/characters/{self.imgpath}_icon.png').convert_alpha(), (80, 80))
+			if Path(Character.DIR + self.imgpath + '_icon.png').is_file():
+				icon = pygame.transform.scale(pygame.image.load(Character.DIR + self.imgpath + '_icon.png').convert_alpha(), (80, 80))
 				self.imgIcon = icon
 			else:
-				icon = pygame.transform.scale(pygame.image.load(f'data/images/characters/placeholder_icon.png').convert_alpha(), (80, 80))
+				icon = pygame.transform.scale(pygame.image.load(Character.DIR + 'placeholder_icon.png').convert_alpha(), (80, 80))
 
 		if not bg:
 			return icon
 		else:
 			sf = pygame.Surface((80,80))
-			sf.fill(RANK_COLOR[self.rarity-1])
+			sf.fill(Character.RANK_COLOR[self.rarity-1])
 			sf.blit(icon,(0,0))
 			return sf
 
@@ -155,11 +161,11 @@ class Character:
 		art = self.imgArt
 		if art is None:
 			artX, artY = 400,450
-			if Path(f'data/images/characters/{self.imgpath}_art.png').is_file():
-				art = pygame.transform.scale(pygame.image.load(f'data/images/characters/{self.imgpath}_art.png').convert_alpha(), (artX, artY))
+			if Path(Character.DIR + self.imgpath + '_art.png').is_file():
+				art = pygame.transform.scale(pygame.image.load(Character.DIR + self.imgpath + '_art.png').convert_alpha(), (artX, artY))
 				self.imgArt = art
 			else:
-				art = pygame.transform.scale(pygame.image.load(f'data/images/characters/placeholder_art.png').convert_alpha(), (artX, artY))
+				art = pygame.transform.scale(pygame.image.load(Character.DIR + 'placeholder_art.png').convert_alpha(), (artX, artY))
 				
 		return art
 

@@ -1,15 +1,13 @@
 import pygame
 from stuff import *
 
-EXITTXT = pygame.font.SysFont(None, 24).render('Press Esc, it stands for Escape!', True, (255, 255, 255))
-
 class Settings(Scene):
 	def __init__(page,game):
 		page.game = game
 
 		page.bg = pygame.Surface(page.game.screen.get_size())
 		page.bg.fill((100,100,100))
-		page.bg.blit(EXITTXT,(20,20))
+		page.bg.blit(Scene.EXITTXT,(20,20))
 
 		page.images = {}
 		page.label = {}
@@ -33,7 +31,7 @@ class Settings(Scene):
 		)
 		page.inputbox['music'].state = 1
 
-		page.inputbox['redeem'] = CoolTextBox(Box(pygame.Rect(600,250,400,40),bgcolor=(255,255,255)),Text('defaultText'),callback=lambda: enterCode(page.inputbox['redeem'].text.text))
+		page.inputbox['redeem'] = CoolTextBox(Box(pygame.Rect(600,250,400,40),bgcolor=(255,255,255)),Text('defaultText'),callback=lambda: page.game.enterCode(page.inputbox['redeem'].text.text))
 		page.inputbox['redeem'].text.text = 'Hi pookie!!'
 		page.inputbox['redeem'].text.update()
 
@@ -74,7 +72,3 @@ class Settings(Scene):
 		for _,group in sorted(page.groups.items()):
 			for _,obj in group.items():
 				obj.draw(page.game.screen)
-
-def enterCode(code):
-	if code == 'NOTAGAME':
-		pass

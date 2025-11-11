@@ -4,9 +4,8 @@ import math
 from stuff import *
 import json
 
-PATH_BANNERS = 'data/banners.json'
-PATH_BANNERFOLDER = 'data/images/banners/'
 class GachaPlace(Scene):
+	PATH_BANNERS = 'data/banners.json'
 	def __init__(page,game):
 		page.game = game
 
@@ -26,7 +25,7 @@ class GachaPlace(Scene):
 
 		page.banners = []
 		page.currentbanner = 0
-		with open(PATH_BANNERS,'r') as f:
+		with open(__class__.PATH_BANNERS,'r') as f:
 			banners = json.load(f)
 			for banner in banners:
 				page.banners.append(page.Banner(page,banner))
@@ -123,6 +122,8 @@ class GachaPlace(Scene):
 			
 			TextBox(Box(pygame.Rect(page.game.screen.get_width()/2-65,400,130,40),(225,225,225)),Text(f'worth: {sum([char.power for char in page.justroll])}',32,(225,130,0))).draw(page.game.screen)
 
+	DISPLAYROLL_CMAX = 5
+	DISPLAYROLL_TOPCENTER = (1067/2, 200)
 	def roll(page,rolls=1):
 		page.reload_currency(-rolls*page.currentBanner().price)
 		for _ in range(rolls):
@@ -149,6 +150,7 @@ class GachaPlace(Scene):
 			btn.state = page.currentbanner
 
 	class Banner:
+		DIR_IMAGE = 'data/images/banners/'
 		def __init__(self,page,banner):
 			self.id = banner['id']
 			self.name = banner['name']
@@ -160,7 +162,7 @@ class GachaPlace(Scene):
 					self.banner_by_rank[char.rarity][1].append(char)
 
 			try:
-				self.bg = pygame.transform.scale(pygame.image.load(PATH_BANNERFOLDER+banner['img']).convert_alpha(), page.game.screen.get_size())
+				self.bg = pygame.transform.scale(pygame.image.load(__class__.DIR_IMAGE + banner['img']).convert_alpha(), page.game.screen.get_size())
 			except:
 				self.bg = pygame.surface(page.game.screen.get_size())
 

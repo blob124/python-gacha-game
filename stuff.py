@@ -5,15 +5,15 @@ import typing
 
 pygame.init()
 
-EXITTXT = pygame.font.SysFont(None, 24).render('Press Esc, it stands for Escape!', True, (255, 255, 255))
-
+BLANK_SURFACE = pygame.Surface((0,0))
 class Scene:
+	EXITTXT = pygame.font.SysFont(None, 24).render('Press Esc, it stands for Escape!', True, (255, 255, 255))
 	def __init__(page, game):
 		page.game = game
 
 		page.bg = pygame.Surface(page.game.screen.get_size())
 		page.bg.fill((100,100,100))
-		page.bg.blit(EXITTXT,(20,20))
+		page.bg.blit(Scene.EXITTXT,(20,20))
 
 		page.bg.blit(renderTextWithLines('Scene\nTemplate',size=67),(432,234))
 
@@ -176,15 +176,18 @@ class SimpleButton(Interactable):
 		super().__init__(rect.topleft,*[[pygame.Rect(0,0,rect.w,rect.h),*sprite] for sprite in sprites],callback=callback)
 
 class CoolTextBox(Interactable):
+	count = 0
 	def __init__(self, box:Box|Image, text:Text, callback=None):
-		self.BLINK_EVENT = pygame.USEREVENT + 1
+		CoolTextBox.count += 1
+		self.BLINK_EVENT = pygame.USEREVENT + CoolTextBox.count
 		pygame.time.set_timer(self.BLINK_EVENT, 545)
 
+		hitbox = pygame.Rect(0,0,box.rect.w,box.rect.h)
 		super().__init__(box.rect.topleft,
-			[pygame.Rect(0,0,box.rect.w,box.rect.h),Box(box.rect,box.bgColor,box.bdColor,0)],
-			[pygame.Rect(0,0,box.rect.w,box.rect.h),Box(box.rect,box.bgColor,box.bdColor,2)],
-			[pygame.Rect(0,0,box.rect.w,box.rect.h),Box(box.rect,box.bgColor,box.bdColor,3)],
-			[pygame.Rect(0,0,box.rect.w,box.rect.h),Box(box.rect,box.bgColor,box.bdColor,3)]
+			[hitbox,Box(box.rect,box.bgColor,box.bdColor,0)],
+			[hitbox,Box(box.rect,box.bgColor,box.bdColor,2)],
+			[hitbox,Box(box.rect,box.bgColor,box.bdColor,3)],
+			[hitbox,Box(box.rect,box.bgColor,box.bdColor,3)]
 		)
 		self.focus = False
 		self.hovered = False

@@ -1,16 +1,14 @@
 import pygame
 from stuff import *
 
-EXITTXT = pygame.font.SysFont(None, 24).render('Press Esc, it stands for Escape!', True, (255, 255, 255))
-BLANK_SURFACE = pygame.Surface((0,0))
-DISPLAY_LABEL_SURFACE = TextBox(Box(pygame.Rect(0,0,240,80),(255,255,255)),Text(f'Name:\nRank:\nPower Level:\nNumbers:',align='left'),align='left')
 class Archive(Scene):
+	DISPLAY_LABEL_SURFACE = TextBox(Box(pygame.Rect(0,0,240,80),(255,255,255)),Text(f'Name:\nRank:\nPower Level:\nNumbers:',align='left'),align='left')
 	def __init__(page,game):
 		page.game = game
 
 		page.bg = pygame.Surface(page.game.screen.get_size())
 		page.bg.fill((30,100,30))
-		page.bg.blit(EXITTXT,(20,20))
+		page.bg.blit(Scene.EXITTXT,(20,20))
 
 		page.char_image_table = {}
 		for id,char in page.game.data.items():
@@ -71,19 +69,19 @@ class Archive(Scene):
 			if obtained:
 				page.char_display['art'] = page.char_image_table[char.id][1]
 				page.char_display['label'] = TextBox(
-					Image(DISPLAY_LABEL_SURFACE.sprite, (680,500)),
+					Image(__class__.DISPLAY_LABEL_SURFACE.sprite, (680,500)),
 					Text(f'{char.name}\n{char.rarity}\n{char.power}\n{page.game.char_obtained.get(char.id) or 0}',align='right'),align='right'
 				)
 			else:
 				page.char_display['art'] = page.char_image_table[char.id][1]
 				page.char_display['label'] = TextBox(
-					Image(DISPLAY_LABEL_SURFACE.sprite, (680,500)),
+					Image(__class__.DISPLAY_LABEL_SURFACE.sprite, (680,500)),
 					Text(f'???\n???\n???\n0',align='right'),align='right'
 				)
 		else:
 			page.char_display['art'] = Image(BLANK_SURFACE,(600,50))
 			page.char_display['label'] = TextBox(
-				Image(DISPLAY_LABEL_SURFACE.sprite, (680,500)),
+				Image(__class__.DISPLAY_LABEL_SURFACE.sprite, (680,500)),
 				Text(f'-\n-\n0\n0',align='right'),align='right'
 			)
 
