@@ -9,7 +9,7 @@ from scenes.TeamPage import Party
 from scenes.ArchivePage import Archive
 from scenes.OptionPage import Settings
 
-from stuff import Scene
+from stuff import *
 
 PATH_CHAR_DATA = 'data/characterlist.json'
 PATH_PROFILE = 'data/profile.json'
@@ -70,7 +70,7 @@ class Game:
 			with open(PATH_CHAR_DATA,'r') as f:
 				chardata = json.load(f)
 				for char in chardata:
-					game.data[char['id']] = Character(char)
+					game.data[char['id']] = Character(**char)
 		else:
 			print(f'{PATH_CHAR_DATA} not found :sad:')
 			pygame.quit()
@@ -128,48 +128,6 @@ class Game:
 			game.currency += 2000
 			return 'you recieve 2000 kurenzy.'
 		return 'Invalid Code'
-
-class Character:
-	DIR = 'data/images/characters/'
-	RANK_COLOR = [(124,142,161),(100,156,128),(91,150,186),(160,119,201),(204,152,88)]
-	def __init__(self, char):
-		self.id = char['id']
-		self.name = char['name']
-		self.rarity = char['rarity']
-		self.power = char['power']
-		self.imgpath = char['path']
-
-		self.imgIcon = None
-		self.imgArt = None
-	
-	def getIcon(self,bg=False):
-		icon = self.imgIcon
-		if icon is None:
-			if Path(Character.DIR + self.imgpath + '_icon.png').is_file():
-				icon = pygame.transform.scale(pygame.image.load(Character.DIR + self.imgpath + '_icon.png').convert_alpha(), (80, 80))
-				self.imgIcon = icon
-			else:
-				icon = pygame.transform.scale(pygame.image.load(Character.DIR + 'placeholder_icon.png').convert_alpha(), (80, 80))
-
-		if not bg:
-			return icon
-		else:
-			sf = pygame.Surface((80,80))
-			sf.fill(Character.RANK_COLOR[self.rarity-1])
-			sf.blit(icon,(0,0))
-			return sf
-
-	def getArt(self):
-		art = self.imgArt
-		if art is None:
-			artX, artY = 400,450
-			if Path(Character.DIR + self.imgpath + '_art.png').is_file():
-				art = pygame.transform.scale(pygame.image.load(Character.DIR + self.imgpath + '_art.png').convert_alpha(), (artX, artY))
-				self.imgArt = art
-			else:
-				art = pygame.transform.scale(pygame.image.load(Character.DIR + 'placeholder_art.png').convert_alpha(), (artX, artY))
-				
-		return art
 
 game = Game()
 DEBUGGING = False

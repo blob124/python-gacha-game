@@ -69,19 +69,19 @@ class Archive(Scene):
 			if obtained:
 				page.char_display['art'] = page.char_image_table[char.id][1]
 				page.char_display['label'] = TextBox(
-					Image(__class__.DISPLAY_LABEL_SURFACE.sprite, (680,500)),
+					Image(__class__.DISPLAY_LABEL_SURFACE.image, (680,500)),
 					Text(f'{char.name}\n{char.rarity}\n{char.power}\n{page.game.char_obtained.get(char.id) or 0}',align='right'),align='right'
 				)
 			else:
 				page.char_display['art'] = page.char_image_table[char.id][1]
 				page.char_display['label'] = TextBox(
-					Image(__class__.DISPLAY_LABEL_SURFACE.sprite, (680,500)),
+					Image(__class__.DISPLAY_LABEL_SURFACE.image, (680,500)),
 					Text(f'???\n???\n???\n0',align='right'),align='right'
 				)
 		else:
 			page.char_display['art'] = Image(BLANK_SURFACE,(600,50))
 			page.char_display['label'] = TextBox(
-				Image(__class__.DISPLAY_LABEL_SURFACE.sprite, (680,500)),
+				Image(__class__.DISPLAY_LABEL_SURFACE.image, (680,500)),
 				Text(f'-\n-\n0\n0',align='right'),align='right'
 			)
 

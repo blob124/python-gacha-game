@@ -1,11 +1,55 @@
 import pygame
 import numpy as np
+from pathlib import Path
 
 import typing
 
 pygame.init()
 
 BLANK_SURFACE = pygame.Surface((0,0))
+
+class Character:
+	DIR = 'data/images/characters/'
+	RANK_COLOR = [(124,142,161),(100,156,128),(91,150,186),(160,119,201),(204,152,88)]
+	def __init__(self, id, name, rarity, power, path):
+		self.id = id
+		self.name = name
+		self.rarity = rarity
+		self.power = power
+		self.imgpath = path
+
+		self.imgIcon = None
+		self.imgArt = None
+	
+	def getIcon(self,bg=False):
+		icon = self.imgIcon
+		if icon is None:
+			if Path(Character.DIR + self.imgpath + '_icon.png').is_file():
+				icon = pygame.transform.scale(pygame.image.load(Character.DIR + self.imgpath + '_icon.png').convert_alpha(), (80, 80))
+				self.imgIcon = icon
+			else:
+				icon = pygame.transform.scale(pygame.image.load(Character.DIR + 'placeholder_icon.png').convert_alpha(), (80, 80))
+
+		if not bg:
+			return icon
+		else:
+			sf = pygame.Surface((80,80))
+			sf.fill(Character.RANK_COLOR[self.rarity-1])
+			sf.blit(icon,(0,0))
+			return sf
+
+	def getArt(self):
+		art = self.imgArt
+		if art is None:
+			artX, artY = 400,450
+			if Path(Character.DIR + self.imgpath + '_art.png').is_file():
+				art = pygame.transform.scale(pygame.image.load(Character.DIR + self.imgpath + '_art.png').convert_alpha(), (artX, artY))
+				self.imgArt = art
+			else:
+				art = pygame.transform.scale(pygame.image.load(Character.DIR + 'placeholder_art.png').convert_alpha(), (artX, artY))
+
+		return art
+
 class Scene:
 	EXITTXT = pygame.font.SysFont(None, 24).render('Press Esc, it stands for Escape!', True, (255, 255, 255))
 	def __init__(page, game):
@@ -47,21 +91,19 @@ class Scene:
 class Image(pygame.sprite.Sprite):
 	def __init__(self, image:pygame.Surface, topleft:tuple[float,float]):
 		super().__init__()
-		self.sprite = image
-		self.rect = self.sprite.get_rect(topleft=topleft)
+		self.image = image
+		self.rect = self.image.get_rect(topleft=topleft)
 
 		self.drawgrayscale = False
-		self.spriteButGray = None
-		
-		#self.get_grayscale()
+		self.imageButGray = None
 
 	def get_grayscale(self):
-		if self.spriteButGray is None:
-			self.spriteButGray = to_grayscale(self.sprite)
-		return self.spriteButGray
+		if self.imageButGray is None:
+			self.imageButGray = to_grayscale(self.image)
+		return self.imageButGray
 	
 	def draw(self, screen):
-		toblit = self.sprite if not self.drawgrayscale else self.get_grayscale()
+		toblit = self.image if not self.drawgrayscale else self.get_grayscale()
 		screen.blit(toblit, self.rect)
 
 class Box:
@@ -70,7 +112,7 @@ class Box:
 		self.bgColor = bgcolor
 		self.bdColor = boardcolor
 		self.bdSize = boardsize
-		self.sprite = None
+		self.image = None
 
 		self.update()
 	
@@ -85,10 +127,10 @@ class Box:
 			daBox.fill(bgColor)
 			if bdSize > 0:
 				pygame.draw.rect(daBox,bdColor[:3],(0,0,self.rect.w,self.rect.h),bdSize)
-		self.sprite = daBox
+		self.image = daBox
 
 	def draw(self, screen):
-		screen.blit(self.sprite, self.rect)
+		screen.blit(self.image, self.rect)
 
 class Text:
 	def __init__(self, text='', textsize=24, textcolor:tuple[int,...]=(0,0,0), antialias=True, align: typing.Literal['left','middle','right']='middle'):
@@ -105,12 +147,12 @@ class Text:
 			self.text = newtext
 		if xy is None:
 			xy=self.rect.topleft
-		self.sprite = renderTextWithLines(self.text,self.textColor,self.textSize,self.antialias,self.align)
-		self.rect = self.sprite.get_rect(topleft=xy)
+		self.image = renderTextWithLines(self.text,self.textColor,self.textSize,self.antialias,self.align)
+		self.rect = self.image.get_rect(topleft=xy)
 		return self
 
 	def draw(self, screen):
-		screen.blit(self.sprite, self.rect)
+		screen.blit(self.image, self.rect)
 
 class TextBox:
 	def __init__(self, box:Box|Image, text:Text, align:typing.Literal['left','middle','right']='middle'):
@@ -120,16 +162,16 @@ class TextBox:
 		self.update()
 	
 	def update(self):
-		self.sprite = self.box.sprite.copy()
+		self.image = self.box.image.copy()
 		match self.align.lower():
 			case 'left':
 				padding = 5
-				self.sprite.blit(self.text.sprite,(padding,self.box.rect.h/2-self.text.rect.h/2))
+				self.image.blit(self.text.image,(padding,self.box.rect.h/2-self.text.rect.h/2))
 			case 'right':
 				padding = 5
-				self.sprite.blit(self.text.sprite,(self.box.rect.w-self.text.rect.w-padding,self.box.rect.h/2-self.text.rect.h/2))
+				self.image.blit(self.text.image,(self.box.rect.w-self.text.rect.w-padding,self.box.rect.h/2-self.text.rect.h/2))
 			case _:
-				self.sprite.blit(self.text.sprite,(self.box.rect.w/2-self.text.rect.w/2,self.box.rect.h/2-self.text.rect.h/2))
+				self.image.blit(self.text.image,(self.box.rect.w/2-self.text.rect.w/2,self.box.rect.h/2-self.text.rect.h/2))
 
 	def resize_fit(self,padding=0):
 		new_rect = self.text.rect.inflate(padding*2,padding*2)
@@ -141,7 +183,7 @@ class TextBox:
 		return self
 	
 	def draw(self, screen):
-		screen.blit(self.sprite, self.box.rect)
+		screen.blit(self.image, self.box.rect)
 
 class Interactable:
 	def __init__(self, xy:tuple[float, float], *states:list[pygame.Rect|pygame.Surface], callback=None):
@@ -166,7 +208,7 @@ class Interactable:
 		return self.states[self.state*2 + (1 if self.hovered else 0)]
 
 	def draw(self,screen):
-		screen.blit(self.curState().get('sprite').sprite, (self.x,self.y))
+		screen.blit(self.curState().get('sprite').image, (self.x,self.y))
 	
 	def handle_event(self, event):
 		if event.type == pygame.MOUSEBUTTONDOWN and event.button == 1:
@@ -205,8 +247,8 @@ class CoolTextBox(Interactable):
 		self.text.update(xy=(self.x+padding, self.y+self.curState()['sprite'].rect.h/2-self.text.rect.h/2))
 
 	def draw(self, screen):
-		screen.blit(self.curState()['sprite'].sprite, (self.x,self.y))
-		screen.blit(self.text.sprite, self.text.rect)
+		screen.blit(self.curState()['sprite'].image, (self.x,self.y))
+		screen.blit(self.text.image, self.text.rect)
 		if self.textcursorvisible:
 			pygame.draw.line(screen, self.text.textColor, (self.text.rect.right+1,self.text.rect.top-5), (self.text.rect.right+1,self.text.rect.bottom+1), 1)
 	
@@ -263,25 +305,25 @@ def renderTextWithLines(text:str,textColor:tuple[int,...]=(0,0,0),size=24,anti_a
 	return text_surface
 
 def to_grayscale(surface: pygame.Surface) -> pygame.Surface:
-    """
-    Convert a Pygame surface to grayscale.
-    Preserves alpha transparency if present.
-    """
-    # Handle alpha
-    has_alpha = surface.get_flags() & pygame.SRCALPHA
+	"""
+	Convert a Pygame surface to grayscale.
+	Preserves alpha transparency if present.
+	"""
+	# Handle alpha
+	has_alpha = surface.get_flags() & pygame.SRCALPHA
 
-    # Convert to array
-    arr = pygame.surfarray.array3d(surface)
-    gray = (0.299 * arr[:, :, 0] + 0.587 * arr[:, :, 1] + 0.114 * arr[:, :, 2]).astype(np.uint8)
-    gray3d = np.stack((gray,)*3, axis=-1)
+	# Convert to array
+	arr = pygame.surfarray.array3d(surface)
+	gray = (0.299 * arr[:, :, 0] + 0.587 * arr[:, :, 1] + 0.114 * arr[:, :, 2]).astype(np.uint8)
+	gray3d = np.stack((gray,)*3, axis=-1)
 
-    # Make grayscale surface
-    gray_surface = pygame.surfarray.make_surface(gray3d)
+	# Make grayscale surface
+	gray_surface = pygame.surfarray.make_surface(gray3d)
 
-    # If surface had transparency, copy alpha channel
-    if has_alpha:
-        alpha = pygame.surfarray.array_alpha(surface)
-        gray_surface = gray_surface.convert_alpha()
-        pygame.surfarray.pixels_alpha(gray_surface)[:] = alpha
+	# If surface had transparency, copy alpha channel
+	if has_alpha:
+		alpha = pygame.surfarray.array_alpha(surface)
+		gray_surface = gray_surface.convert_alpha()
+		pygame.surfarray.pixels_alpha(gray_surface)[:] = alpha
 
-    return gray_surface
+	return gray_surface

@@ -37,11 +37,7 @@ class Settings(Scene):
 		page.inputbox['redeem'] = CoolTextBox(Box(pygame.Rect(600,250,400,40),bgcolor=(255,255,255)),Text('defaultText'),callback=lambda: page.updatewarningbox(page.game.enterCode(page.inputbox['redeem'].text.text)))
 		page.inputbox['redeem'].text.update('Hi pookie!!')
 
-		page.inputbox['reset'] = SimpleButton(pygame.Rect(600,350,100,50),
-			[TextBox(Box(pygame.Rect(0,0,100,50),bgcolor=(128,128,160)),Text('Reset',textcolor=(247,13,26)))],
-			[TextBox(Box(pygame.Rect(0,0,100,50),bgcolor=(78,78,97)),Text('Reset',textcolor=(247,13,26)))],
-			[TextBox(Box(pygame.Rect(0,0,100,50),bgcolor=(255,0,0)),Text('ARE YOU\nSURE?',textcolor=(0,0,0),textsize=24))],
-			[TextBox(Box(pygame.Rect(0,0,100,50),bgcolor=(190,0,0)),Text('ARE YOU\nSURE?',textcolor=(0,0,0),textsize=24))],
+		page.inputbox['reset'] = SimpleButton(pygame.Rect(600,350,100,50), [TextBox(Box(pygame.Rect(0,0,100,50),bgcolor=(128,128,160)),Text('Reset',textcolor=(247,13,26)))], [TextBox(Box(pygame.Rect(0,0,100,50),bgcolor=(78,78,97)),Text('Reset',textcolor=(247,13,26)))], [TextBox(Box(pygame.Rect(0,0,100,50),bgcolor=(255,0,0)),Text('ARE YOU\nSURE?',textcolor=(0,0,0),textsize=24))], [TextBox(Box(pygame.Rect(0,0,100,50),bgcolor=(190,0,0)),Text('ARE YOU\nSURE?',textcolor=(0,0,0),textsize=24))],
 			callback=lambda: page.proceed_reset()
 		)
 
@@ -75,15 +71,14 @@ class Settings(Scene):
 			else:
 				button.hovered = False
 		
+		page.inputbox['music'].update(page.game.mousepos)
+		page.inputbox['redeem'].update(page.game.mousepos)
+		#page.inputbox['reset'].update(page.game.mousepos)
 		
 		if not page.showwarning:
 			page.inputbox['reset'].update(page.game.mousepos)
 		else:
 			page.inputbox['reset'].hovered = False
-		
-		page.inputbox['music'].update(page.game.mousepos)
-		page.inputbox['redeem'].update(page.game.mousepos)
-		#page.inputbox['reset'].update(page.game.mousepos)
 
 	def draw(page):
 		page.game.screen.blit(page.bg,(0,0))
