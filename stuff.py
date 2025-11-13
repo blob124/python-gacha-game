@@ -89,19 +89,51 @@ class Scene:
 				obj.draw(page.game.screen)
 
 class Image(pygame.sprite.Sprite):
-	def __init__(self, image:pygame.Surface, topleft:tuple[float,float]):
+	tweenDuration = 100
+	def __init__(self, image:pygame.Surface, topleft:tuple[float,float] = (0,0)):
 		super().__init__()
-		self.image = image
+		self.image = self.ogimage = image
 		self.rect = self.image.get_rect(topleft=topleft)
 
 		self.drawgrayscale = False
 		self.imageButGray = None
+
+		self.animating = False
+		self.start_time = 0
+		self.scale = self.target_scale = self.start_scale = 1
 
 	def get_grayscale(self):
 		if self.imageButGray is None:
 			self.imageButGray = to_grayscale(self.image)
 		return self.imageButGray
 	
+	def update(self, mouse_pos):
+		if self.rect.collidepoint(mouse_pos):
+			self.scale_animation_errr_thing(1.1)
+		else:
+			self.scale_animation_errr_thing(1)
+		
+		# Tween animation
+		if self.animating:
+			t = (pygame.time.get_ticks() - self.start_time) / __class__.tweenDuration
+			if t >= 1:
+				t = 1
+				self.animating = False
+			eased_t = Tween.easeOutCirc(t)
+			self.scale = self.start_scale + (self.target_scale - self.start_scale) * eased_t
+
+		# Scale image
+		self.image = pygame.transform.rotozoom(self.ogimage, 0, self.scale)
+		self.imageButGray = None
+		self.rect = self.image.get_rect(center=self.rect.center)
+	
+	def scale_animation_errr_thing(self, target_scale:float) -> None:
+		if self.target_scale != target_scale:
+			self.animating = True
+			self.start_time = pygame.time.get_ticks()
+			self.start_scale = self.scale
+			self.target_scale = target_scale
+
 	def draw(self, screen):
 		toblit = self.image if not self.drawgrayscale else self.get_grayscale()
 		screen.blit(toblit, self.rect)
@@ -275,6 +307,21 @@ class CoolTextBox(Interactable):
 class VignetteLayer(Box):
 	def __init__(self, game, color:tuple[int,...]=(0,0,0)):
 		super().__init__(pygame.Rect(0,0,game.screen.get_width(),game.screen.get_height()), (list(color)+[100])[:4])
+
+class Tween:
+	"tween lib at home"
+	def easeOutQuad(t: float) -> float:
+		return 1 - (1 - t)**2
+	
+	def easeInCubic(t: float) -> float:
+		return t**3
+	
+	def easeOutCubic(t: float) -> float:
+		return 1 - (1 - t)**3
+	
+	def easeOutCirc(t: float) -> float:
+		return (1 - (t - 1)**2)**0.5
+
 
 def renderTextWithLines(text:str,textColor:tuple[int,...]=(0,0,0),size=24,anti_alias=True, align:typing.Literal['left','middle','right']='middle') -> pygame.Surface:
 	thefont = pygame.font.SysFont(None, size)

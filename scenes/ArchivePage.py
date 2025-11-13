@@ -12,7 +12,7 @@ class Archive(Scene):
 
 		page.char_image_table = {}
 		for id,char in page.game.data.items():
-			page.char_image_table[id] = (Image(char.getIcon(bg=True),(0,0)),Image(char.getArt(),(600,50)))
+			page.char_image_table[id] = (Image(char.getIcon(bg=True)),Image(char.getArt()))
 
 		page.images = {}
 		page.char_icons = {}
@@ -54,10 +54,9 @@ class Archive(Scene):
 
 	def update(page):
 		for id,image in page.char_icons.items():
-			if image.rect.collidepoint(page.game.mousepos):
-				if page.currentcharacter.id != id:
-					page.updateDisplay(page.game.data[id])
-					break
+			image.update(page.game.mousepos)
+			if image.rect.collidepoint(page.game.mousepos) and page.currentcharacter.id != id:
+				page.updateDisplay(page.game.data[id])
 
 		for _,button in page.buttons.items():
 			button.update(page.game.mousepos)
@@ -68,22 +67,13 @@ class Archive(Scene):
 			obtained = (page.game.char_obtained.get(char.id) or 0)>0
 			if obtained:
 				page.char_display['art'] = page.char_image_table[char.id][1]
-				page.char_display['label'] = TextBox(
-					Image(__class__.DISPLAY_LABEL_SURFACE.image, (680,500)),
-					Text(f'{char.name}\n{char.rarity}\n{char.power}\n{page.game.char_obtained.get(char.id) or 0}',align='right'),align='right'
-				)
+				page.char_display['label'] = TextBox(Image(__class__.DISPLAY_LABEL_SURFACE.image, (680,500)), Text(f'{char.name}\n{char.rarity}\n{char.power}\n{page.game.char_obtained.get(char.id) or 0}',align='right'),align='right')
 			else:
 				page.char_display['art'] = page.char_image_table[char.id][1]
-				page.char_display['label'] = TextBox(
-					Image(__class__.DISPLAY_LABEL_SURFACE.image, (680,500)),
-					Text(f'???\n???\n???\n0',align='right'),align='right'
-				)
+				page.char_display['label'] = TextBox(Image(__class__.DISPLAY_LABEL_SURFACE.image, (680,500)), Text(f'???\n???\n???\n0',align='right'),align='right')
 		else:
 			page.char_display['art'] = Image(BLANK_SURFACE,(600,50))
-			page.char_display['label'] = TextBox(
-				Image(__class__.DISPLAY_LABEL_SURFACE.image, (680,500)),
-				Text(f'-\n-\n0\n0',align='right'),align='right'
-			)
+			page.char_display['label'] = TextBox(Image(__class__.DISPLAY_LABEL_SURFACE.image, (680,500)), Text(f'-\n-\n0\n0',align='right'),align='right')
 
 	def draw(page):
 		page.game.screen.blit(page.bg,(0,0))
