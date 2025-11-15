@@ -127,6 +127,9 @@ class Game:
 		if code == 'NOTAGAME':
 			game.currency += 2000
 			return 'you recieve 2000 kurenzy.'
+		if code == 'GIVEME67000':
+			game.currency += 67000
+			return 'you recieve 67000 kurenzy.'
 		return 'Invalid Code'
 
 game = Game()

@@ -30,8 +30,8 @@ class Archive(Scene):
 			if id==0:
 				continue
 			obtained = (page.game.char_obtained.get(id) or 0)>0
-			r,c = ii//cmax,ii%cmax
-			page.char_image_table[id][0].rect.topleft = (50+(80+10)*ii,75)
+			r,c = ii%cmax,ii//cmax
+			page.char_image_table[id][0].rect.topleft = (50+(80+10)*r,75+(80+10)*c)
 			page.char_image_table[id][0].drawgrayscale = not obtained
 
 			page.char_image_table[id][1].rect.topleft = (600,50)

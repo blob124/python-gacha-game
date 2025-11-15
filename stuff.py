@@ -7,6 +7,12 @@ import typing
 pygame.init()
 
 BLANK_SURFACE = pygame.Surface((0,0))
+FONT_ABLE = {(None,24):pygame.font.SysFont(None,24)}
+
+def getFont(font,size):
+	if FONT_ABLE.get((font,size)) is None:
+		FONT_ABLE[(font,size)] = pygame.font.SysFont(font,size)
+	return FONT_ABLE.get((font,size))
 
 class Character:
 	DIR = 'data/images/characters/'
@@ -51,7 +57,7 @@ class Character:
 		return art
 
 class Scene:
-	EXITTXT = pygame.font.SysFont(None, 24).render('Press Esc, it stands for Escape!', True, (255, 255, 255))
+	EXITTXT = getFont(None,24).render('Press Esc, it stands for Escape!', True, (255, 255, 255))
 	def __init__(page, game):
 		page.game = game
 
@@ -138,7 +144,7 @@ class Image(pygame.sprite.Sprite):
 		toblit = self.image if not self.drawgrayscale else self.get_grayscale()
 		screen.blit(toblit, self.rect)
 
-class Box:
+class Box(pygame.sprite.Sprite):
 	def __init__(self, rect:pygame.Rect, bgcolor:tuple[int,...]=(0,0,0,0), boardcolor:tuple[int,...]=(0,0,0), boardsize=0):
 		self.rect = rect
 		self.bgColor = bgcolor
@@ -164,7 +170,7 @@ class Box:
 	def draw(self, screen):
 		screen.blit(self.image, self.rect)
 
-class Text:
+class Text(pygame.sprite.Sprite):
 	def __init__(self, text='', textsize=24, textcolor:tuple[int,...]=(0,0,0), antialias=True, align: typing.Literal['left','middle','right']='middle'):
 		self.text = str(text)
 		self.textSize = textsize
@@ -259,12 +265,7 @@ class CoolTextBox(Interactable):
 		pygame.time.set_timer(self.BLINK_EVENT, 545)
 
 		hitbox = pygame.Rect(0,0,box.rect.w,box.rect.h)
-		super().__init__(box.rect.topleft,
-			[hitbox,Box(box.rect,box.bgColor,box.bdColor,0)],
-			[hitbox,Box(box.rect,box.bgColor,box.bdColor,2)],
-			[hitbox,Box(box.rect,box.bgColor,box.bdColor,3)],
-			[hitbox,Box(box.rect,box.bgColor,box.bdColor,3)]
-		)
+		super().__init__(box.rect.topleft, [hitbox,Box(box.rect,box.bgColor,box.bdColor,0)], [hitbox,Box(box.rect,box.bgColor,box.bdColor,2)], [hitbox,Box(box.rect,box.bgColor,box.bdColor,3)], [hitbox,Box(box.rect,box.bgColor,box.bdColor,3)])
 		self.focus = False
 		self.hovered = False
 		self.textcursorvisible = False
@@ -287,10 +288,11 @@ class CoolTextBox(Interactable):
 	def handle_event(self, event):
 		if event.type == self.BLINK_EVENT and self.focus:
 			self.textcursorvisible = not self.textcursorvisible
-		elif event.type == pygame.MOUSEBUTTONDOWN and event.button == 1 and self.hovered:
-			self.focus = not self.focus
+		elif event.type == pygame.MOUSEBUTTONDOWN and event.button == 1:
+			self.focus = self.hovered and not self.focus
 			self.state = 1 if self.focus else 0
 			self.textcursorvisible = self.focus
+
 		elif self.focus and event.type == pygame.KEYDOWN:
 			match pygame.key.name(event.key):
 				case 'backspace':
@@ -322,15 +324,14 @@ class Tween:
 	def easeOutCirc(t: float) -> float:
 		return (1 - (t - 1)**2)**0.5
 
-
 def renderTextWithLines(text:str,textColor:tuple[int,...]=(0,0,0),size=24,anti_alias=True, align:typing.Literal['left','middle','right']='middle') -> pygame.Surface:
-	thefont = pygame.font.SysFont(None, size)
+	thefont = getFont(None, size)
 	antialias = anti_alias
 	if '\n' not in text:
 		text_render = thefont.render(text,antialias,textColor)
 		text_surface = text_render
 	else:
-		newlineOffY = size/8
+		newlineOffY = thefont.size('A')[1]/8
 
 		text_render = {(x:=thefont.render(minitext,antialias,textColor)):(x.get_width(),x.get_height()) for minitext in text.split('\n')}
 		text_render_width = max([w for w,_ in text_render.values()])

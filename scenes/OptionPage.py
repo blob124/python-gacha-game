@@ -19,13 +19,16 @@ class Settings(Scene):
 						0:page.images,
 				 		1:page.inputbox,
 				 		2:page.buttons,
-						3:page.displaywarning}
+						9:page.displaywarning}
 
 		page.label['music'] = Text(text='Music',textsize=48).update(xy=(250,150))
 		page.label['redeem'] = Text(text='Redeem Code',textsize=48).update(xy=(250,250))
 		page.label['reset'] = Text(text='Reset',textsize=48).update(xy=(250,350))
 
-		page.inputbox['music'] = Interactable((600,150), [pygame.Rect(4,4,32,32),Image(pygame.image.load(f'data/images/checkbox_0.png').convert_alpha())], [pygame.Rect(4,4,32,32),Image(pygame.image.load(f'data/images/checkbox_0.png').convert_alpha())], [pygame.Rect(4,4,32,32),Image(pygame.image.load(f'data/images/checkbox_1.png').convert_alpha())], [pygame.Rect(4,4,32,32),Image(pygame.image.load(f'data/images/checkbox_1.png').convert_alpha())],
+		checkbox0 = pygame.image.load(f'data/images/checkbox_0.png').convert_alpha()
+		checkbox1 = pygame.image.load(f'data/images/checkbox_1.png').convert_alpha()
+
+		page.inputbox['music'] = Interactable((600,150), [pygame.Rect(4,4,32,32),Image(checkbox0)], [pygame.Rect(4,4,32,32),Image(checkbox0)], [pygame.Rect(4,4,32,32),Image(checkbox1)], [pygame.Rect(4,4,32,32),Image(checkbox1)],
 			callback=lambda: (page.game.toggle_music(), setattr(page.inputbox['music'], 'state', 1 if page.game.musicplaying else 0))
 		)
 		page.inputbox['music'].state = 1
