@@ -2,7 +2,7 @@
 	{
 		"id": "military",
 		"name": "Bnuuy Recruit",
-		"list": [2,3,4],
+		"list": [2,3,4,6,8,9,10,11,12],
 		"chance": [14.4,35.6,44.3,5.1,0.6],
 		"price": 160,
 		"img": "banner_military.png"
@@ -10,7 +10,7 @@
 	{
 		"id": "politics",
 		"name": "Political Hare",
-		"list": [1,4],
+		"list": [1,2,6,7,11],
 		"chance": [10,30,50,9.4,0.6],
 		"price": 120,
 		"img": "banner_politics.png"
@@ -18,7 +18,7 @@
 	{
 		"id": "academy",
 		"name": "Rabit Education",
-		"list": [5],
+		"list": [2,3,4,5],
 		"chance": [32,43,16,8.4,0.6],
 		"price": 80,
 		"img": "banner_academy.png"
