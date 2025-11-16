@@ -1,6 +1,7 @@
 import pygame
 import random
 import math
+from pathlib import Path
 from stuff import *
 import json
 
@@ -81,10 +82,11 @@ class GachaPlace(Scene):
 				button.handle_event(event)
 
 	def update(page):
-		for _,button in page.buttons.items():
-			if not (page.showroll or page.showwarning):
+		if not (page.showroll or page.showwarning):
+			for _,button in page.buttons.items():
 				button.update(page.game.mousepos)
-			else:
+		else:
+			for _,button in page.buttons.items():
 				button.hovered = False
 
 	def draw(page):
@@ -150,10 +152,12 @@ class GachaPlace(Scene):
 
 			if Path(__class__.DIR_IMAGE + img).is_file():
 				self.bg = pygame.transform.scale(pygame.image.load(__class__.DIR_IMAGE + img).convert_alpha(), page.game.screen.get_size())
+				title = Text(self.name,67,(255,255,255))
+				title.rect = title.image.get_rect(center=(1067/2,100))
+				title.draw(self.bg)
 			else:
 				self.bg = pygame.surface(page.game.screen.get_size())
-
-			self.bg.blit(Text(self.id,antialias=False).image,(0,0))
+				Text(self.id,antialias=False).draw()
 
 		def singleroll(self):
 				'''return a Character Class'''

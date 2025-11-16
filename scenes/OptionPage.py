@@ -20,7 +20,7 @@ class Settings(Scene):
 			callback=lambda: (page.game.toggle_music(), setattr(page.inputbox['music'], 'state', 1 if page.game.musicplaying else 0)))
 		page.ui['music-input'].state = 1
 
-		page.ui['redeem-input'] = CoolTextBox(Box(pygame.Rect(600,250,400,40),bgcolor=(255,255,255)),Text('defaultText'),callback=lambda: page.updatewarningbox(page.game.enterCode(page.inputbox['redeem'].text.text)))
+		page.ui['redeem-input'] = CoolTextBox(Box(pygame.Rect(600,250,400,40),bgcolor=(255,255,255)),Text('defaultText'),callback=lambda: page.updatewarningbox(page.game.enterCode(page.ui['redeem-input'].text.text)))
 
 		page.ui['reset-input'] = SimpleButton(pygame.Rect(600,350,100,50), [TextBox(Box(pygame.Rect(0,0,100,50),bgcolor=(128,128,160)),Text('Reset',textcolor=(247,13,26)))], [TextBox(Box(pygame.Rect(0,0,100,50),bgcolor=(78,78,97)),Text('Reset',textcolor=(247,13,26)))], [TextBox(Box(pygame.Rect(0,0,100,50),bgcolor=(255,0,0)),Text('ARE YOU\nSURE?',textcolor=(0,0,0),textsize=24))], [TextBox(Box(pygame.Rect(0,0,100,50),bgcolor=(190,0,0)),Text('ARE YOU\nSURE?',textcolor=(0,0,0),textsize=24))],
 			callback=lambda: page.proceed_reset())
