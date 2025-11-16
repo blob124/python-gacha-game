@@ -11,11 +11,6 @@ from scenes.OptionPage import Settings
 
 from stuff import *
 
-PATH_CHAR_DATA = 'data/characterlist.json'
-PATH_PROFILE = 'data/profile.json'
-PATH_BANNERS = 'data/banners.json'
-PATH_MUSIC = 'data/sfx/music.mp3'
-
 pygame.init()
 
 class Game:
@@ -24,13 +19,8 @@ class Game:
 		pygame.display.set_caption("Gacha Gambling")
 		game.clock = pygame.time.Clock()
 
-		pygame.mixer.init()
-		pygame.mixer.music.load(PATH_MUSIC)
-		pygame.mixer.music.set_volume(0.6)
-		pygame.mixer.music.play(-1)
-		game.musicplaying = True
-
 		game.loadData()
+
 		game.scenes = {	'GachaPlace':GachaPlace(game),
 						'Missions':Scene(game),
 						'TeamUp':Scene(game),
@@ -66,31 +56,35 @@ class Game:
 		game.char_obtained = {}
 		game.party = []
 
-		if Path(PATH_CHAR_DATA).is_file():
-			with open(PATH_CHAR_DATA,'r') as f:
-				chardata = json.load(f)
-				for char in chardata:
-					game.data[char['id']] = Character(**char)
-		else:
-			print(f'{PATH_CHAR_DATA} not found :sad:')
+		needfile = [PATH_CHARDATA_JSON,PATH_PROFILE_JSON,PATH_BANNERS_JSON,PATH_MUSIC_FILE]
+		missing = [file for file in needfile if not Path(file).is_file()]
+
+		if missing:
+			print(f'file(s) not found :sad:\n{missing}')
 			pygame.quit()
 			sys.exit()
+		
+		with open(PATH_CHARDATA_JSON,'r') as f:
+			chardata = json.load(f)
+			for char in chardata:
+				game.data[char['id']] = Character(**char)
 
-		if Path(PATH_PROFILE).is_file():
-			with open(PATH_PROFILE,'r') as f:
-				profile = json.load(f)
-				for id,dup in profile['obtained'].items():
-					game.char_obtained[int(id)] = dup
+		with open(PATH_PROFILE_JSON,'r') as f:
+			profile = json.load(f)
+			for id,dup in profile['obtained'].items():
+				game.char_obtained[int(id)] = dup
 
-				game.party = profile['team']
-				game.currency = profile['currency']
-		else:
-			print(f'{PATH_PROFILE} err something error')
-			pygame.quit()
-			sys.exit()
+			game.party = profile['team']
+			game.currency = profile['currency']
+		
+		pygame.mixer.init()
+		pygame.mixer.music.load(PATH_MUSIC_FILE)
+		pygame.mixer.music.set_volume(0.6)
+		pygame.mixer.music.play(-1)
+		game.musicplaying = True
 	
 	def saveData(game):
-		with open(PATH_PROFILE,'w') as f:
+		with open(PATH_PROFILE_JSON,'w') as f:
 			data = {
 				"obtained": game.char_obtained,
 				"team": game.party,

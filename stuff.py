@@ -4,6 +4,11 @@ from pathlib import Path
 
 import typing
 
+PATH_CHARDATA_JSON = 'data/characterlist.json'
+PATH_PROFILE_JSON = 'data/profile.json'
+PATH_BANNERS_JSON = 'data/banners.json'
+PATH_MUSIC_FILE = 'data/sfx/music.ogg'
+
 pygame.init()
 
 BLANK_SURFACE = pygame.Surface((0,0))
