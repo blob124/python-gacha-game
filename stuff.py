@@ -340,6 +340,41 @@ class VignetteLayer(Box):
 	def __init__(self, game, color:tuple[int,...]=(0,0,0)):
 		super().__init__(pygame.Rect(0,0,game.screen.get_width(),game.screen.get_height()), (list(color)+[100])[:4])
 
+class ToolTip(Interactable):
+	def __init__(self, icon:Image, textbox:TextBox):
+		self.icon = icon
+		darkicon = pygame.mask.from_surface(icon.image).to_surface(setcolor=(0,0,0,80),unsetcolor=(0,0,0,0))
+		icon1 = Image(icon.image.copy(),(0,0))
+		icon2 = Image(icon.image.copy(),(0,0))
+		icon2.image.blit(darkicon,(0,0))
+		super().__init__(icon.rect.topleft,*[[pygame.Rect(0,0,icon.rect.w,icon.rect.h),*sprite] for sprite in [[icon1],[icon2]]],callback=None)
+		self.tooltip = textbox
+		self.tooltipImage = Image(pygame.Surface((self.tooltip.box.rect.w,self.tooltip.box.rect.h+10),flags=pygame.SRCALPHA),(0,0))
+		self.tooltipabove = True
+		self.repostooltip()
+		if self.tooltipabove:
+			pygame.draw.polygon(self.tooltipImage.image,self.tooltip.box.bgColor,[(self.tooltipImage.rect.w/2-30,self.tooltipImage.rect.h-10),(self.tooltipImage.rect.w/2,self.tooltipImage.rect.h),(self.tooltipImage.rect.w/2+30,self.tooltipImage.rect.h-10)])
+		else:
+			pygame.draw.polygon(self.tooltipImage.image,self.tooltip.box.bgColor,[(self.tooltipImage.rect.w/2-30,10),(self.tooltipImage.rect.w/2,0),(self.tooltipImage.rect.w/2+30,10)])
+		self.tooltip.draw(self.tooltipImage.image)
+
+	def repostooltip(self):
+		self.icon.rect.topleft = (self.x,self.y)
+		self.tooltipImage.rect.midbottom = self.icon.rect.midtop
+		self.tooltipImage.rect.bottom -= 5
+		self.tooltip.box.rect.top = 0
+		self.tooltipabove = True
+		if self.tooltipImage.rect.top<0:
+			self.tooltipImage.rect.midtop = self.icon.rect.midbottom
+			self.tooltipImage.rect.top += 5
+			self.tooltip.box.rect.top = 10
+			self.tooltipabove = False
+
+	def draw(self, screen):
+		super().draw(screen)
+		if self.hovered:
+			self.tooltipImage.draw(screen)
+
 class Tween:
 	"tween lib at home"
 	def easeOutQuad(t: float) -> float:

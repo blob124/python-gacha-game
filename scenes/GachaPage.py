@@ -21,7 +21,10 @@ class GachaPlace(Scene):
 				page.banners.append(page.Banner(page,**banner))
 
 		page.ui['kurenzy'] = TextBox(Box(pygame.Rect(0,40,100,50),bgcolor=(255,255,255,255)),Text(f'kurenzy: {page.game.currency}',textsize=28)).resize_fit(padding=5)
-		
+		minigraycirc = pygame.Surface((26,26),flags=pygame.SRCALPHA)
+		pygame.draw.circle(minigraycirc,(130,130,130),(minigraycirc.get_width()/2,minigraycirc.get_height()/2),minigraycirc.get_width()/2)
+		page.ui['tooltip'] = ToolTip(Image(TextBox(Image(minigraycirc),Text('i',24,(255,255,255))).image,(0,0)),TextBox(Box(pygame.Rect(0,0,110,50),(80,80,80,130)),Text('tip for gambling: \ndon\'t',18,(255,255,255))))
+
 		page.buttons['left-arrow'] = SimpleButton(pygame.Rect(40,(page.game.screen.get_height()-80)//2,50,80), [TextBox(Box(pygame.Rect(0,0,50,80),(255,255,255,190)),Text('<',textsize=96))], [TextBox(Box(pygame.Rect(0,0,50,80),(190,190,190,255)),Text('<',textsize=96))],
 			callback=lambda: page.changeBanner(-1))
 		
@@ -85,9 +88,11 @@ class GachaPlace(Scene):
 		if not (page.showroll or page.showwarning):
 			for _,button in page.buttons.items():
 				button.update(page.game.mousepos)
+			page.ui['tooltip'].update(page.game.mousepos)
 		else:
 			for _,button in page.buttons.items():
 				button.hovered = False
+			page.ui['tooltip'].update(page.game.mousepos)
 
 	def draw(page):
 		page.game.screen.blit(page.bg,(0,0))
@@ -127,7 +132,11 @@ class GachaPlace(Scene):
 		page.game.currency += delta
 		page.ui['kurenzy'].text.update(f'kurenzy: {page.game.currency}')
 		page.ui['kurenzy'].resize_fit(padding=5)
-	
+
+		page.ui['tooltip'].x = page.ui['kurenzy'].box.rect.right+10
+		page.ui['tooltip'].y = page.ui['kurenzy'].box.rect.top+3
+		page.ui['tooltip'].repostooltip()
+		
 	def currentBanner(page):
 		return page.banners[page.currentbanner]
 	
