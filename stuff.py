@@ -69,35 +69,60 @@ class Scene:
 		page.bg = pygame.Surface(page.game.screen.get_size())
 		page.bg.fill((100,100,100))
 		page.bg.blit(Scene.EXITTXT,(20,20))
-
 		page.bg.blit(renderTextWithLines('Scene\nTemplate',size=67),(432,234))
 
 		page.images = {}
 		page.buttons = {}
+		page.ui = {}
+		page.displaywarning = {}
 		page.groups = {	0:page.images,
-				 		1:page.buttons}
+				 		1:page.buttons,
+						2:page.ui,
+						9:page.displaywarning}
+		
+		page.showwarning = False
+		page.displaywarning['vig'] = VignetteLayer(page.game)
+		page.displaywarning['warnbox'] = TextBox(Box(pygame.Rect(page.game.screen.get_width()/2-175,page.game.screen.get_height()/2-30,350,60),(225,225,225)),Text(f'warningtext',32,(225,130,0)))
 	
 	def enter(page):
 		pass
 
 	def handle_events(page, events):
 		for event in events:
+			if page.showwarning:
+				if event.type == pygame.KEYDOWN and event.key == pygame.K_ESCAPE or event.type == pygame.MOUSEBUTTONDOWN and event.button == 1:
+					page.showwarning = False
+				continue
+			
 			if event.type == pygame.KEYDOWN:
 				if event.key == pygame.K_ESCAPE:
 					page.game.change_scene('GachaPlace')
 			elif event.type == pygame.MOUSEBUTTONDOWN and event.button == 1: # detect mouseclick
 				pass
 
+			for _,button in page.buttons.items():
+				button.handle_event(event)
+
 	def update(page):
-		for _,obj in page.buttons.items():
-			obj.state = 1 if obj.isHover(page.game.mousepos) else 0
+		for _,button in page.buttons.items():
+			if not page.showwarning:
+				button.update(page.game.mousepos)
+			else:
+				button.hovered = False
 
 	def draw(page):
 		page.game.screen.blit(page.bg,(0,0))
 
 		for _,group in sorted(page.groups.items()):
+			if group is page.displaywarning and not page.showwarning:
+				continue
 			for _,obj in group.items():
 				obj.draw(page.game.screen)
+
+	def updatewarningbox(page,text):
+		page.displaywarning['warnbox'].text.update(text)
+		page.displaywarning['warnbox'].update()
+		page.showwarning = True
 
 class Image(pygame.sprite.Sprite):
 	tweenDuration = 100

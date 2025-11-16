@@ -5,69 +5,51 @@ from stuff import *
 import json
 
 class GachaPlace(Scene):
-	PATH_BANNERS = 'data/banners.json'
 	def __init__(page,game):
-		page.game = game
+		super().__init__(game)
 
-		page.bg = pygame.Surface(page.game.screen.get_size())
-
-		page.images = {}
-		page.buttons = {}
-		page.ui = {}
-		page.displayroll = {}
-		page.displaywarning = {}
-		page.showwarning = False
-		page.groups = {	0:page.images,
-				 		1:page.buttons,
-						2:page.ui,
-						3:page.displayroll,
-						9:page.displaywarning}
-		
 		page.showroll = False
+		page.displayroll = {}
+		page.groups[3] = page.displayroll
 
 		page.banners = []
 		page.currentbanner = 0
-		with open(__class__.PATH_BANNERS,'r') as f:
+		with open(PATH_BANNERS_JSON,'r') as f:
 			banners = json.load(f)
 			for banner in banners:
 				page.banners.append(page.Banner(page,**banner))
 
 		page.ui['kurenzy'] = TextBox(Box(pygame.Rect(0,40,100,50),bgcolor=(255,255,255,255)),Text(f'kurenzy: {page.game.currency}',textsize=28)).resize_fit(padding=5)
-
+		
 		page.buttons['left-arrow'] = SimpleButton(pygame.Rect(40,(page.game.screen.get_height()-80)//2,50,80), [TextBox(Box(pygame.Rect(0,0,50,80),(255,255,255,190)),Text('<',textsize=96))], [TextBox(Box(pygame.Rect(0,0,50,80),(190,190,190,255)),Text('<',textsize=96))],
-			callback=lambda: page.changeBanner(-1)
-		)
+			callback=lambda: page.changeBanner(-1))
+		
 		page.buttons['right-arrow'] = SimpleButton(pygame.Rect(page.game.screen.get_width()-50-40,(page.game.screen.get_height()-80)//2,50,80), [TextBox(Box(pygame.Rect(0,0,50,80),(255,255,255,190)),Text('>',textsize=96))], [TextBox(Box(pygame.Rect(0,0,50,80),(190,190,190,255)),Text('>',textsize=96))],
-			callback=lambda: page.changeBanner(+1)
-		)
+			callback=lambda: page.changeBanner(+1))
 		
 		page.buttons['roll1'] = SimpleButton(pygame.Rect(200,500,100,50), *[[TextBox(Box(pygame.Rect(0,0,100,50),(255,255,0,255) if i==0 else (190,190,0,255)),Text(f'roll1\nx{banner.price}',30,(247,13,26)))] for banner in page.banners for i in range(2)],
-			callback=lambda: page.roll(1)
-		)
+			callback=lambda: page.roll(1))
+		
 		page.buttons['roll10'] = SimpleButton(pygame.Rect(769,500,100,50), *[[TextBox(Box(pygame.Rect(0,0,100,50),(255,255,0,255) if i==0 else (190,190,0,255)),Text(f'roll1\nx{10*banner.price}',30,(247,13,26)))] for banner in page.banners for i in range(2)],
-			callback=lambda: page.roll(10)
-		)
+			callback=lambda: page.roll(10))
 		'''
 		page.buttons['goMission'] = SimpleButton(pygame.Rect(790,25,50,50), [TextBox(Box(pygame.Rect(0,0,50,50),(255,255,0,255)),Text('Quest',18,(247,13,26)))], [TextBox(Box(pygame.Rect(0,0,50,50),(190,190,0,255)),Text('Quest',18,(247,13,26)))],
-			callback=lambda: page.game.change_scene('Missions')
-		)
-		page.buttons['goParty'] = SimpleButton(pygame.Rect(855,25,50,50), [TextBox(Box(pygame.Rect(0,0,50,50),(255,255,0,255)),Text('Party',18,(247,13,26)))], [TextBox(Box(pygame.Rect(0,0,50,50),(190,190,0,255)),Text('Party',18,(247,13,26)))],
-			callback=lambda: page.game.change_scene('TeamUp')
-		)'''
-		page.buttons['goArchive'] = SimpleButton(pygame.Rect(920,25,50,50), [TextBox(Box(pygame.Rect(0,0,50,50),(255,255,0,255)),Text('Archive',18,(247,13,26)))], [TextBox(Box(pygame.Rect(0,0,50,50),(190,190,0,255)),Text('Archive',18,(247,13,26)))],
-			callback=lambda: page.game.change_scene('ArchivePage')
-		)
-		page.buttons['goOption'] = SimpleButton(pygame.Rect(985,25,50,50), [TextBox(Box(pygame.Rect(0,0,50,50),(255,255,0,255)),Text('Option',18,(247,13,26)))], [TextBox(Box(pygame.Rect(0,0,50,50),(190,190,0,255)),Text('Option',18,(247,13,26)))],
-			callback=lambda: page.game.change_scene('OptionPage')
-		)
+			callback=lambda: page.game.change_scene('Missions'))
 		
+		page.buttons['goParty'] = SimpleButton(pygame.Rect(855,25,50,50), [TextBox(Box(pygame.Rect(0,0,50,50),(255,255,0,255)),Text('Party',18,(247,13,26)))], [TextBox(Box(pygame.Rect(0,0,50,50),(190,190,0,255)),Text('Party',18,(247,13,26)))],
+			callback=lambda: page.game.change_scene('TeamUp'))
+		'''
+		page.buttons['goArchive'] = SimpleButton(pygame.Rect(920,25,50,50), [TextBox(Box(pygame.Rect(0,0,50,50),(255,255,0,255)),Text('Archive',18,(247,13,26)))], [TextBox(Box(pygame.Rect(0,0,50,50),(190,190,0,255)),Text('Archive',18,(247,13,26)))],
+			callback=lambda: page.game.change_scene('ArchivePage'))
+		
+		page.buttons['goOption'] = SimpleButton(pygame.Rect(985,25,50,50), [TextBox(Box(pygame.Rect(0,0,50,50),(255,255,0,255)),Text('Option',18,(247,13,26)))], [TextBox(Box(pygame.Rect(0,0,50,50),(190,190,0,255)),Text('Option',18,(247,13,26)))],
+			callback=lambda: page.game.change_scene('OptionPage'))
+		
+
 		page.displayroll['vig'] = VignetteLayer(page.game)
 		page.displayroll['reward'] = pygame.sprite.Group()
 		page.displayroll['value'] = TextBox(Box(pygame.Rect(__class__.DISPLAYROLL_TOPCENTER[0]-65,400,130,40),(225,225,225)),Text(f'worth: {0}',32,(225,130,0)))
 
-		page.displaywarning['vig'] = VignetteLayer(page.game)
-		page.displaywarning['warnbox'] = TextBox(Box(pygame.Rect(page.game.screen.get_width()/2-175,page.game.screen.get_height()/2-30,350,60),(225,225,225)),Text(f'warningtext',32,(225,130,0)))
-		
 	def enter(page):
 		page.bg = page.currentBanner().bg
 		page.reload_currency()
@@ -83,8 +65,8 @@ class GachaPlace(Scene):
 				if event.type == pygame.KEYDOWN and event.key == pygame.K_ESCAPE or event.type == pygame.MOUSEBUTTONDOWN and event.button == 1:
 					page.showroll = False
 					page.displayroll['reward'].empty()
-
 				continue
+			
 			if event.type == pygame.KEYDOWN:
 				if event.key == pygame.K_RETURN:
 					pass
@@ -93,7 +75,7 @@ class GachaPlace(Scene):
 				elif event.key == pygame.K_RIGHT:
 					page.changeBanner(+1)
 			elif event.type == pygame.MOUSEBUTTONDOWN and event.button == 1: # detect mouseclick
-				pass		
+				pass
 
 			for _,button in page.buttons.items():
 				button.handle_event(event)
@@ -109,19 +91,14 @@ class GachaPlace(Scene):
 		page.game.screen.blit(page.bg,(0,0))
 
 		for _,group in sorted(page.groups.items()):
-			if group is page.displayroll and not page.showroll:
-				continue
-			
 			if group is page.displaywarning and not page.showwarning:
+				continue
+
+			if group is page.displayroll and not page.showroll:
 				continue
 			
 			for _,obj in group.items():
 				obj.draw(page.game.screen)
-
-	def updatewarningbox(page,text):
-		page.displaywarning['warnbox'].text.update(text)
-		page.displaywarning['warnbox'].update()
-		page.showwarning = True
 
 	DISPLAYROLL_CMAX = 5
 	DISPLAYROLL_TOPCENTER = (1067/2, 200)

@@ -4,9 +4,8 @@ from stuff import *
 class Archive(Scene):
 	DISPLAY_LABEL_SURFACE = TextBox(Box(pygame.Rect(0,0,240,80),(255,255,255)),Text(f'Name:\nRank:\nPower Level:\nNumbers:',align='left'),align='left')
 	def __init__(page,game):
-		page.game = game
+		super().__init__(game)
 
-		page.bg = pygame.Surface(page.game.screen.get_size())
 		page.bg.fill((30,100,30))
 		page.bg.blit(Scene.EXITTXT,(20,20))
 
@@ -14,14 +13,10 @@ class Archive(Scene):
 		for id,char in page.game.data.items():
 			page.char_image_table[id] = (Image(char.getIcon(bg=True)),Image(char.getArt()))
 
-		page.images = {}
 		page.char_icons = {}
 		page.char_display = {}
-		page.buttons = {}
-		page.groups = {	-2:page.char_icons,
-				 		-1:page.char_display,
-						0:page.images,
-				 		1:page.buttons}
+		page.groups[-2] = page.char_icons
+		page.groups[-1] = page.char_display
 
 	def enter(page):
 		ii = 0
@@ -40,28 +35,25 @@ class Archive(Scene):
 			page.char_icons[id] = page.char_image_table[id][0]
 			ii+=1
 
-		page.updateDisplay(page.game.data[1])
+		page.hoverNewCharacter(None)
 
 	def handle_events(page, events):
-		for event in events:
-			if event.type == pygame.KEYDOWN:
-				if event.key == pygame.K_RETURN:
-					pass
-				elif event.key == pygame.K_ESCAPE:
-						page.game.change_scene('GachaPlace')
-			elif event.type == pygame.MOUSEBUTTONDOWN and event.button == 1: # detect mouseclick
-				pass
+		super().handle_events(events)
 
 	def update(page):
+		super().update()
+
 		for id,image in page.char_icons.items():
 			image.update(page.game.mousepos)
-			if image.rect.collidepoint(page.game.mousepos) and page.currentcharacter.id != id:
-				page.updateDisplay(page.game.data[id])
+			if image.rect.collidepoint(page.game.mousepos) and (page.currentcharacter is None or page.currentcharacter.id != id):
+				page.hoverNewCharacter(page.game.data[id])
 
-		for _,button in page.buttons.items():
-			button.update(page.game.mousepos)
+	def draw(page):
+		super().draw()
+		
+		pygame.draw.line(page.game.screen, (255,255,255), (530,60), (530,540), 1)
 	
-	def updateDisplay(page,char):
+	def hoverNewCharacter(page,char):
 		page.currentcharacter = char
 		if char != None:
 			obtained = (page.game.char_obtained.get(char.id) or 0)>0
@@ -74,12 +66,3 @@ class Archive(Scene):
 		else:
 			page.char_display['art'] = Image(BLANK_SURFACE,(600,50))
 			page.char_display['label'] = TextBox(Image(__class__.DISPLAY_LABEL_SURFACE.image, (680,500)), Text(f'-\n-\n0\n0',align='right'),align='right')
-
-	def draw(page):
-		page.game.screen.blit(page.bg,(0,0))
-
-		for _,group in sorted(page.groups.items()):
-			for _,obj in group.items():
-				obj.draw(page.game.screen)
-		
-		pygame.draw.line(page.game.screen, (255,255,255), (530,60), (530,540), 1)
