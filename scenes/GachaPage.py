@@ -92,7 +92,7 @@ class GachaPlace(Scene):
 		else:
 			for _,button in page.buttons.items():
 				button.hovered = False
-			page.ui['tooltip'].update(page.game.mousepos)
+			page.ui['tooltip'].hovered = False
 
 	def draw(page):
 		page.game.screen.blit(page.bg,(0,0))

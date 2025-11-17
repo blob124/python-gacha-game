@@ -20,6 +20,7 @@ class Game:
 		game.clock = pygame.time.Clock()
 
 		game.loadData()
+		game.entercodehere_flag = 0
 
 		game.scenes = {	'GachaPlace':GachaPlace(game),
 						'Missions':Scene(game),
@@ -55,6 +56,7 @@ class Game:
 		game.data = {}
 		game.char_obtained = {}
 		game.party = []
+		game.usedcode = []
 
 		needfile = [PATH_CHARDATA_JSON,PATH_PROFILE_JSON,PATH_BANNERS_JSON,PATH_MUSIC_FILE]
 		missing = [file for file in needfile if not Path(file).is_file()]
@@ -77,6 +79,13 @@ class Game:
 			game.party = profile['team']
 			game.currency = profile['currency']
 		
+		try:
+			with open('data/usedcode.json','r') as f:
+				file = json.load(f)
+				game.usedcode = file
+		except:
+			print(f'where is your history code O.o')
+		
 		pygame.mixer.init()
 		pygame.mixer.music.load(PATH_MUSIC_FILE)
 		pygame.mixer.music.set_volume(0.6)
@@ -91,6 +100,9 @@ class Game:
 				"currency": game.currency
 			}
 			json.dump(data, f, indent='\t')
+		
+		with open('data/usedcode.json','w') as f:
+			json.dump(game.usedcode, f)
 	
 	def increase_char_obtain(game,charid,amount=1):
 		if charid not in game.char_obtained:
@@ -102,6 +114,7 @@ class Game:
 		game.char_obtained = {'0':0}
 		game.party = ['','','','','']
 		game.currency = 6700
+		game.usedcode = []
 		game.saveData()
 	
 	def toggle_music(game):
@@ -118,12 +131,45 @@ class Game:
 		game.scene.enter()
 
 	def enterCode(game, code):
+		if code in game.usedcode:
+			return f'this code ({code})\nis used.'
 		if code == 'NOTAGAME':
 			game.currency += 2000
+			game.usedcode.append(code)
 			return 'you recieve 2000 kurenzy.'
 		if code == 'GIVEME67000':
 			game.currency += 67000
+			game.usedcode.append(code)
 			return 'you recieve 67000 kurenzy.'
+		if code == 'ENTERCODEHERE':
+			game.currency += 0
+			text_return = ''
+			if game.entercodehere_flag == 0:
+				text_return = 'ENTERCODEHERE is not work bro\ntry again.'
+			elif game.entercodehere_flag == 1:
+				text_return = 'you think do it again make it work?\nit\'s not work like that bro.'
+			elif game.entercodehere_flag == 2:
+				text_return = 'why are you still doing it.'
+			elif game.entercodehere_flag == 3:
+				text_return = 'ok! i can do this all day.'
+			elif game.entercodehere_flag == 4:
+				text_return = 'i appreciate that you\ntyped each letter for this.'
+			elif game.entercodehere_flag == 5:
+				text_return = 'arent you here to do\nthe gacha thing?.'
+			elif game.entercodehere_flag == 6:
+				text_return = 'now you keep bugging me.'
+			elif game.entercodehere_flag == 7:
+				text_return = 'get out.'
+			else:
+				return 'ENTERCODEHERE\nis not a valid code.'
+			game.entercodehere_flag += 1
+			return text_return
+		if code == 'again':
+			game.currency += 0
+			return 'if you want the code so bad,\n just find it in the code. bruh'
+		if code == 'redeemCode':
+			game.currency += 1
+			return '* ok                                                     \n* (you recieve a single kurenzy.)'
 		return 'Invalid Code'
 
 game = Game()

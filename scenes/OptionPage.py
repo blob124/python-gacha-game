@@ -24,9 +24,13 @@ class Settings(Scene):
 
 		page.ui['reset-input'] = SimpleButton(pygame.Rect(600,350,100,50), [TextBox(Box(pygame.Rect(0,0,100,50),bgcolor=(128,128,160)),Text('Reset',textcolor=(247,13,26)))], [TextBox(Box(pygame.Rect(0,0,100,50),bgcolor=(78,78,97)),Text('Reset',textcolor=(247,13,26)))], [TextBox(Box(pygame.Rect(0,0,100,50),bgcolor=(255,0,0)),Text('ARE YOU\nSURE?',textcolor=(0,0,0),textsize=24))], [TextBox(Box(pygame.Rect(0,0,100,50),bgcolor=(190,0,0)),Text('ARE YOU\nSURE?',textcolor=(0,0,0),textsize=24))],
 			callback=lambda: page.proceed_reset())
-	
+		
+		minigraycirc = pygame.Surface((26,26),flags=pygame.SRCALPHA)
+		pygame.draw.circle(minigraycirc,(130,130,130),(minigraycirc.get_width()/2,minigraycirc.get_height()/2),minigraycirc.get_width()/2)
+		page.ui['redeem-tooltip'] = ToolTip(Image(TextBox(Image(minigraycirc),Text('i',24,(255,255,255))).image,(484,253)),TextBox(Box(pygame.Rect(0,0,120,50),(80,80,80,130)),Text('I am redeem-tooltip\n\"Click\" the thing and\ninsert redeemCode',16,(255,255,255))))
+
 	def enter(page):
-		page.ui['redeem-input'].text.update('Hi pookie!!')
+		page.ui['redeem-input'].text.update('ENTERCODEHERE')
 
 	def handle_events(page, events):
 		for event in events:
@@ -51,12 +55,13 @@ class Settings(Scene):
 		
 		page.ui['music-input'].update(page.game.mousepos)
 		page.ui['redeem-input'].update(page.game.mousepos)
-		#page.inputbox['reset'].update(page.game.mousepos)
 		
 		if not page.showwarning:
 			page.ui['reset-input'].update(page.game.mousepos)
+			page.ui['redeem-tooltip'].update(page.game.mousepos)
 		else:
 			page.ui['reset-input'].hovered = False
+			page.ui['redeem-tooltip'].hovered = False
 
 	def draw(page):
 		super().draw()

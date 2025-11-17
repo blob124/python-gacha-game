@@ -82,7 +82,7 @@ class Scene:
 		
 		page.showwarning = False
 		page.displaywarning['vig'] = VignetteLayer(page.game)
-		page.displaywarning['warnbox'] = TextBox(Box(pygame.Rect(page.game.screen.get_width()/2-175,page.game.screen.get_height()/2-30,350,60),(225,225,225)),Text(f'warningtext',32,(225,130,0)))
+		page.displaywarning['warnbox'] = TextBox(Box(pygame.Rect(page.game.screen.get_width()/2-175,page.game.screen.get_height()/2-30,350,60),(225,225,225)),Text(f'warningtext',28,(225,130,0)))
 	
 	def enter(page):
 		pass
