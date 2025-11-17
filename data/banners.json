@@ -11,7 +11,7 @@
 		"id": "politics",
 		"name": "Political Hare",
 		"list": [1,2,6,7,11],
-		"chance": [10,30,50,9.4,0.6],
+		"chance": [96,0,0,3.6,0.4],
 		"price": 120,
 		"img": "banner_politics.png"
 	},
@@ -19,7 +19,7 @@
 		"id": "academy",
 		"name": "Rabit Education",
 		"list": [2,3,4,5],
-		"chance": [32,43,16,8.4,0.6],
+		"chance": [72,20,8,0,0],
 		"price": 80,
 		"img": "banner_academy.png"
 	}
