@@ -34,7 +34,7 @@ class GachaPlace(Scene):
 		page.buttons['roll1'] = SimpleButton(pygame.Rect(200,500,100,50), *[[TextBox(Box(pygame.Rect(0,0,100,50),(255,255,0,255) if i==0 else (190,190,0,255)),Text(f'roll1\nx{banner.price}',30,(247,13,26)))] for banner in page.banners for i in range(2)],
 			callback=lambda: page.roll(1))
 		
-		page.buttons['roll10'] = SimpleButton(pygame.Rect(769,500,100,50), *[[TextBox(Box(pygame.Rect(0,0,100,50),(255,255,0,255) if i==0 else (190,190,0,255)),Text(f'roll1\nx{10*banner.price}',30,(247,13,26)))] for banner in page.banners for i in range(2)],
+		page.buttons['roll10'] = SimpleButton(pygame.Rect(769,500,100,50), *[[TextBox(Box(pygame.Rect(0,0,100,50),(255,255,0,255) if i==0 else (190,190,0,255)),Text(f'roll10\nx{10*banner.price}',30,(247,13,26)))] for banner in page.banners for i in range(2)],
 			callback=lambda: page.roll(10))
 		'''
 		page.buttons['goMission'] = SimpleButton(pygame.Rect(790,25,50,50), [TextBox(Box(pygame.Rect(0,0,50,50),(255,255,0,255)),Text('Quest',18,(247,13,26)))], [TextBox(Box(pygame.Rect(0,0,50,50),(190,190,0,255)),Text('Quest',18,(247,13,26)))],
