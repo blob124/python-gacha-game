@@ -2,7 +2,7 @@ import pygame
 from stuff import *
 
 class Archive(Scene):
-	DISPLAY_LABEL_SURFACE = TextBox(Box(pygame.Rect(0,0,240,80),(255,255,255)),Text(f'Name:\nRank:\nPower Level:\nNumbers:',align='left'),align='left')
+	DISPLAY_LABEL_SURFACE = TextBox(pygame.Rect(0,0,240,80),(255,255,255),text=f'Name:\nRank:\nPower Level:\nNumbers:',align='left')
 	def __init__(page,game):
 		super().__init__(game)
 
@@ -59,10 +59,10 @@ class Archive(Scene):
 			obtained = (page.game.char_obtained.get(char.id) or 0)>0
 			if obtained:
 				page.char_display['art'] = page.char_image_table[char.id][1]
-				page.char_display['label'] = TextBox(Image(__class__.DISPLAY_LABEL_SURFACE.image, (680,500)), Text(f'{char.name}\n{char.rarity}\n{char.power}\n{page.game.char_obtained.get(char.id) or 0}',align='right'),align='right')
+				page.char_display['label'] = TextBox(Image(__class__.DISPLAY_LABEL_SURFACE.image, (680,500)), text=f'{char.name}\n{char.rarity}\n{char.power}\n{page.game.char_obtained.get(char.id) or 0}',align='right')
 			else:
 				page.char_display['art'] = page.char_image_table[char.id][1]
-				page.char_display['label'] = TextBox(Image(__class__.DISPLAY_LABEL_SURFACE.image, (680,500)), Text(f'???\n???\n???\n0',align='right'),align='right')
+				page.char_display['label'] = TextBox(Image(__class__.DISPLAY_LABEL_SURFACE.image, (680,500)), text=f'???\n???\n???\n0',align='right')
 		else:
 			page.char_display['art'] = Image(BLANK_SURFACE,(600,50))
-			page.char_display['label'] = TextBox(Image(__class__.DISPLAY_LABEL_SURFACE.image, (680,500)), Text(f'-\n-\n0\n0',align='right'),align='right')
+			page.char_display['label'] = TextBox(Image(__class__.DISPLAY_LABEL_SURFACE.image, (680,500)), text=f'-\n-\n0\n0',align='right')

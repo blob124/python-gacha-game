@@ -82,7 +82,7 @@ class Scene:
 		
 		page.showwarning = False
 		page.displaywarning['vig'] = VignetteLayer(page.game)
-		page.displaywarning['warnbox'] = TextBox(Box(pygame.Rect(page.game.screen.get_width()/2-175,page.game.screen.get_height()/2-30,350,60),(225,225,225)),Text(f'warningtext',28,(225,130,0)))
+		page.displaywarning['warnbox'] = TextBox(pygame.Rect(page.game.screen.get_width()/2-175,page.game.screen.get_height()/2-30,350,60),(225,225,225),text=f'warningtext',textsize=28,textcolor=(225,130,0))
 	
 	def enter(page):
 		pass
@@ -120,7 +120,7 @@ class Scene:
 				obj.draw(page.game.screen)
 
 	def updatewarningbox(page,text):
-		page.displaywarning['warnbox'].text.update(text)
+		page.displaywarning['warnbox'].text = text
 		page.displaywarning['warnbox'].update()
 		page.showwarning = True
 
@@ -174,84 +174,73 @@ class Image(pygame.sprite.Sprite):
 		toblit = self.image if not self.drawgrayscale else self.get_grayscale()
 		screen.blit(toblit, self.rect)
 
-class Box(pygame.sprite.Sprite):
-	def __init__(self, rect:pygame.Rect, bgcolor:tuple[int,...]=(0,0,0,0), boardcolor:tuple[int,...]=(0,0,0), boardsize=0):
-		self.rect = rect
+class TextBox:
+	def __init__(self, rect_or_image:pygame.Rect|Image=None, bgcolor:tuple[int,...]=(0,0,0,0), boardcolor:tuple[int,...]=(0,0,0), boardsize=0, text='', textsize=24, textcolor:tuple[int,...]=(0,0,0), antialias=True, align:typing.Literal['left','middle','right']='middle'):
 		self.bgColor = bgcolor
 		self.bdColor = boardcolor
 		self.bdSize = boardsize
-		self.image = None
-
-		self.update()
-	
-	def update(self):
-		daBox = pygame.Surface(self.rect.size, flags=pygame.SRCALPHA)
-		bgColor = (list(self.bgColor)+[255])[:4]
-		bdColor = (list(self.bdColor)+[255])[:4]
-		bdSize = self.bdSize
-		if bdSize >= min(self.rect.size):
-			daBox.fill(bdColor)
-		else:
-			daBox.fill(bgColor)
-			if bdSize > 0:
-				pygame.draw.rect(daBox,bdColor[:3],(0,0,self.rect.w,self.rect.h),bdSize)
-		self.image = daBox
-
-	def draw(self, screen):
-		screen.blit(self.image, self.rect)
-
-class Text(pygame.sprite.Sprite):
-	def __init__(self, text='', textsize=24, textcolor:tuple[int,...]=(0,0,0), antialias=True, align: typing.Literal['left','middle','right']='middle'):
 		self.text = str(text)
 		self.textSize = textsize
 		self.textColor = textcolor
 		self.antialias = antialias
 		self.align = align
 
-		self.update(xy=(0,0))
-	
-	def update(self,newtext=None,xy:tuple[float,float]=None):
-		if newtext is not None:
-			self.text = newtext
-		if xy is None:
-			xy=self.rect.topleft
-		self.image = renderTextWithLines(self.text,self.textColor,self.textSize,self.antialias,self.align)
-		self.rect = self.image.get_rect(topleft=xy)
-		return self
-
-	def draw(self, screen):
-		screen.blit(self.image, self.rect)
-
-class TextBox:
-	def __init__(self, box:Box|Image, text:Text, align:typing.Literal['left','middle','right']='middle'):
-		self.box = box
-		self.text = text
-		self.align = align
+		if type(rect_or_image) is Image:
+			self.bgImage = rect_or_image
+			self.rect = self.bgImage.rect
+		else:
+			self.bgImage = None
+			self.rect = rect_or_image or pygame.Rect(0,0,0,0)
+		
+		self.image = None
 		self.update()
-	
+		if rect_or_image is None:
+			self.fittotext()
+
 	def update(self):
-		self.image = self.box.image.copy()
+		self.updateBox()
+		self.updateText()
+
+	def updateBox(self):
+		if self.bgImage is not None:
+			self.image = self.bgImage.image.copy()
+			return
+		
+		if self.image == None or self.image.get_size != self.rect.size:
+			self.image = pygame.Surface(self.rect.size, flags=pygame.SRCALPHA)
+		
+		if self.bdSize >= min(self.rect.size):
+			self.image.fill(self.bdColor)
+		else:
+			self.image.fill(self.bgColor)
+			if self.bdSize > 0:
+				pygame.draw.rect(self.image,self.bdColor,self.image.get_rect(topleft=(0,0)),self.bdSize)
+	
+	def updateText(self):
+		self.textsurf = renderTextWithLines(self.text,self.textColor,self.textSize,self.antialias,self.align)
 		match self.align.lower():
 			case 'left':
 				padding = 5
-				self.image.blit(self.text.image,(padding,self.box.rect.h/2-self.text.rect.h/2))
+				self.image.blit(self.textsurf,(padding,self.rect.h/2-self.textsurf.get_height()/2))
 			case 'right':
 				padding = 5
-				self.image.blit(self.text.image,(self.box.rect.w-self.text.rect.w-padding,self.box.rect.h/2-self.text.rect.h/2))
+				self.image.blit(self.textsurf,(self.rect.w-self.textsurf.get_width()-padding,self.rect.h/2-self.textsurf.get_height()/2))
 			case _:
-				self.image.blit(self.text.image,(self.box.rect.w/2-self.text.rect.w/2,self.box.rect.h/2-self.text.rect.h/2))
-
-	def resize_fit(self,padding=0):
-		new_rect = self.text.rect.inflate(padding*2,padding*2)
-		self.box.rect.width = new_rect.width
-		self.box.rect.height = new_rect.height
-		self.aligncenter = True
-		self.box.update()
-		self.update()
-		return self
+				self.image.blit(self.textsurf,(self.rect.w/2-self.textsurf.get_width()/2,self.rect.h/2-self.textsurf.get_height()/2))
 	
 	def draw(self, screen):
-		screen.blit(self.image, self.box.rect)
+		screen.blit(self.getSprite(), self.rect)
+
+	def getSprite(self):
+		return self.image
+	
+	def fittotext(self,padding=0):
+		new_rect = self.textsurf.get_rect(topleft=(0,0)).inflate(padding*2,padding*2)
+		self.rect.width = new_rect.width
+		self.rect.height = new_rect.height
+		self.align = 'middle'
+		self.update()
+		return self
 
 class Interactable:
 	def __init__(self, xy:tuple[float, float], *states:list[pygame.Rect|pygame.Surface], callback=None):
@@ -289,31 +278,31 @@ class SimpleButton(Interactable):
 
 class CoolTextBox(Interactable):
 	count = 0
-	def __init__(self, box:Box|Image, text:Text, callback=None):
+	def __init__(self, textbox:TextBox, callback=None):
 		CoolTextBox.count += 1
 		self.BLINK_EVENT = pygame.USEREVENT + CoolTextBox.count
 		pygame.time.set_timer(self.BLINK_EVENT, 545)
 
-		hitbox = pygame.Rect(0,0,box.rect.w,box.rect.h)
-		super().__init__(box.rect.topleft, [hitbox,Box(box.rect,box.bgColor,box.bdColor,0)], [hitbox,Box(box.rect,box.bgColor,box.bdColor,2)], [hitbox,Box(box.rect,box.bgColor,box.bdColor,3)], [hitbox,Box(box.rect,box.bgColor,box.bdColor,3)])
+		super().__init__(textbox.rect.topleft, [textbox.rect, TextBox(textbox.rect,textbox.bgColor,textbox.bdColor,0)], [textbox.rect, TextBox(textbox.rect,textbox.bgColor,textbox.bdColor,2)], [textbox.rect, TextBox(textbox.rect,textbox.bgColor,textbox.bdColor,3)], [textbox.rect, TextBox(textbox.rect,textbox.bgColor,textbox.bdColor,3)])
 		self.focus = False
 		self.hovered = False
 		self.textcursorvisible = False
 
 		self.callback = callback
 
-		self.text = text
+		self.text = TextBox(textbox.rect,text=textbox.text,textsize=textbox.textSize,textcolor=textbox.textColor,align=textbox.align)
 	
 	def update(self, mouse_pos):
-		self.hovered = self.curState()['hitbox'].move(self.x,self.y).collidepoint(mouse_pos)
+		self.hovered = self.curState()['hitbox'].collidepoint(mouse_pos)
 		padding = 5
-		self.text.update(xy=(self.x+padding, self.y+self.curState()['sprite'].rect.h/2-self.text.rect.h/2))
+		self.text.rect.topleft = (self.x+padding, self.y+self.curState()['sprite'].rect.h/2-self.text.rect.h/2)
+		self.text.update()
 
 	def draw(self, screen):
-		screen.blit(self.curState()['sprite'].image, (self.x,self.y))
+		screen.blit(self.curState()['sprite'].image, self.curState()['hitbox'])
 		screen.blit(self.text.image, self.text.rect)
 		if self.textcursorvisible:
-			pygame.draw.line(screen, self.text.textColor, (self.text.rect.right+1,self.text.rect.top-5), (self.text.rect.right+1,self.text.rect.bottom+1), 1)
+			pygame.draw.line(screen, self.text.textColor, (self.text.rect.x+5+self.text.textsurf.get_width()+1,self.text.rect.y+self.text.rect.h/2-self.text.textsurf.get_height()/2-4), (self.text.rect.x+5+self.text.textsurf.get_width()+1,self.text.rect.y+self.text.rect.h/2+self.text.textsurf.get_height()/2+1), 1)
 	
 	def handle_event(self, event):
 		if event.type == self.BLINK_EVENT and self.focus:
@@ -327,16 +316,19 @@ class CoolTextBox(Interactable):
 			match pygame.key.name(event.key):
 				case 'backspace':
 					if len(self.text.text)>0:
-						self.text.update(newtext=self.text.text[:-1])
+						self.text.text = self.text.text[:-1]
+						self.text.update()
 				case 'return':
 					if self.callback:
 						self.callback()
-					self.text.update(newtext='')
+					self.text.text = ''
+					self.text.update()
 				case _:
 					if event.unicode:
-						self.text.update(newtext=self.text.text+event.unicode)
+						self.text.text = self.text.text + event.unicode
+						self.text.update()
 
-class VignetteLayer(Box):
+class VignetteLayer(TextBox):
 	def __init__(self, game, color:tuple[int,...]=(0,0,0)):
 		super().__init__(pygame.Rect(0,0,game.screen.get_width(),game.screen.get_height()), (list(color)+[100])[:4])
 
@@ -349,25 +341,25 @@ class ToolTip(Interactable):
 		icon2.image.blit(darkicon,(0,0))
 		super().__init__(icon.rect.topleft,*[[pygame.Rect(0,0,icon.rect.w,icon.rect.h),*sprite] for sprite in [[icon1],[icon2]]],callback=None)
 		self.tooltip = textbox
-		self.tooltipImage = Image(pygame.Surface((self.tooltip.box.rect.w,self.tooltip.box.rect.h+10),flags=pygame.SRCALPHA),(0,0))
+		self.tooltipImage = Image(pygame.Surface((self.tooltip.rect.w,self.tooltip.rect.h+10),flags=pygame.SRCALPHA),(0,0))
 		self.tooltipabove = True
 		self.repostooltip()
 		if self.tooltipabove:
-			pygame.draw.polygon(self.tooltipImage.image,self.tooltip.box.bgColor,[(self.tooltipImage.rect.w/2-30,self.tooltipImage.rect.h-10),(self.tooltipImage.rect.w/2,self.tooltipImage.rect.h),(self.tooltipImage.rect.w/2+30,self.tooltipImage.rect.h-10)])
+			pygame.draw.polygon(self.tooltipImage.image,self.tooltip.bgColor,[(self.tooltipImage.rect.w/2-30,self.tooltipImage.rect.h-10),(self.tooltipImage.rect.w/2,self.tooltipImage.rect.h),(self.tooltipImage.rect.w/2+30,self.tooltipImage.rect.h-10)])
 		else:
-			pygame.draw.polygon(self.tooltipImage.image,self.tooltip.box.bgColor,[(self.tooltipImage.rect.w/2-30,10),(self.tooltipImage.rect.w/2,0),(self.tooltipImage.rect.w/2+30,10)])
+			pygame.draw.polygon(self.tooltipImage.image,self.tooltip.bgColor,[(self.tooltipImage.rect.w/2-30,10),(self.tooltipImage.rect.w/2,0),(self.tooltipImage.rect.w/2+30,10)])
 		self.tooltip.draw(self.tooltipImage.image)
 
 	def repostooltip(self):
 		self.icon.rect.topleft = (self.x,self.y)
 		self.tooltipImage.rect.midbottom = self.icon.rect.midtop
 		self.tooltipImage.rect.bottom -= 5
-		self.tooltip.box.rect.top = 0
+		self.tooltip.rect.top = 0
 		self.tooltipabove = True
 		if self.tooltipImage.rect.top<0:
 			self.tooltipImage.rect.midtop = self.icon.rect.midbottom
 			self.tooltipImage.rect.top += 5
-			self.tooltip.box.rect.top = 10
+			self.tooltip.rect.top = 10
 			self.tooltipabove = False
 
 	def draw(self, screen):
@@ -392,9 +384,10 @@ class Tween:
 def renderTextWithLines(text:str,textColor:tuple[int,...]=(0,0,0),size=24,anti_alias=True, align:typing.Literal['left','middle','right']='middle') -> pygame.Surface:
 	thefont = getFont(None, size)
 	antialias = anti_alias
-	if '\n' not in text:
-		text_render = thefont.render(text,antialias,textColor)
-		text_surface = text_render
+	if text == '':
+		return BLANK_SURFACE
+	elif '\n' not in text:
+		return thefont.render(text,antialias,textColor)
 	else:
 		newlineOffY = thefont.size('A')[1]/8
 
@@ -415,7 +408,7 @@ def renderTextWithLines(text:str,textColor:tuple[int,...]=(0,0,0),size=24,anti_a
 			text_surface.blit(minitext, (text_render_x, text_render_y))
 			text_render_y += height+newlineOffY
 	
-	return text_surface
+		return text_surface
 
 def to_grayscale(surface: pygame.Surface) -> pygame.Surface:
 	"""

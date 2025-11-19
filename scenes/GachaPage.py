@@ -20,39 +20,40 @@ class GachaPlace(Scene):
 			for banner in banners:
 				page.banners.append(page.Banner(page,**banner))
 
-		page.ui['kurenzy'] = TextBox(Box(pygame.Rect(0,40,100,50),bgcolor=(255,255,255,255)),Text(f'kurenzy: {page.game.currency}',textsize=28)).resize_fit(padding=5)
+		page.ui['kurenzy'] = TextBox(pygame.Rect(0,40,1100,50),(255,255,255),text=f'kurenzy: 0',textsize=28).fittotext(padding=5)
 		minigraycirc = pygame.Surface((26,26),flags=pygame.SRCALPHA)
 		pygame.draw.circle(minigraycirc,(130,130,130),(minigraycirc.get_width()/2,minigraycirc.get_height()/2),minigraycirc.get_width()/2)
-		page.ui['tooltip'] = ToolTip(Image(TextBox(Image(minigraycirc),Text('i',24,(255,255,255))).image,(0,0)),TextBox(Box(pygame.Rect(0,0,110,50),(80,80,80,130)),Text('tip for gambling: \ndon\'t',18,(255,255,255))))
+		tooltipIcon = TextBox(Image(minigraycirc),text='i',textsize=24,textcolor=(255,255,255))
+		page.ui['tooltip'] = ToolTip(Image(tooltipIcon.image,(0,0)),TextBox(pygame.Rect(0,0,110,50),(80,80,80,130),text='tip for gambling: \ndon\'t',textsize=18,textcolor=(255,255,255)))
 
-		page.buttons['left-arrow'] = SimpleButton(pygame.Rect(40,(page.game.screen.get_height()-80)//2,50,80), [TextBox(Box(pygame.Rect(0,0,50,80),(255,255,255,190)),Text('<',textsize=96))], [TextBox(Box(pygame.Rect(0,0,50,80),(190,190,190,255)),Text('<',textsize=96))],
+		page.buttons['left-arrow'] = SimpleButton(pygame.Rect(40,(page.game.screen.get_height()-80)//2,50,80), [TextBox(pygame.Rect(0,0,50,80),(255,255,255,190),text='<',textsize=96)], [TextBox(pygame.Rect(0,0,50,80),(190,190,190,255),text='<',textsize=96)],
 			callback=lambda: page.changeBanner(-1))
 		
-		page.buttons['right-arrow'] = SimpleButton(pygame.Rect(page.game.screen.get_width()-50-40,(page.game.screen.get_height()-80)//2,50,80), [TextBox(Box(pygame.Rect(0,0,50,80),(255,255,255,190)),Text('>',textsize=96))], [TextBox(Box(pygame.Rect(0,0,50,80),(190,190,190,255)),Text('>',textsize=96))],
+		page.buttons['right-arrow'] = SimpleButton(pygame.Rect(page.game.screen.get_width()-50-40,(page.game.screen.get_height()-80)//2,50,80), [TextBox(pygame.Rect(0,0,50,80),(255,255,255,190),text='>',textsize=96)], [TextBox(pygame.Rect(0,0,50,80),(190,190,190,255),text='>',textsize=96)],
 			callback=lambda: page.changeBanner(+1))
 		
-		page.buttons['roll1'] = SimpleButton(pygame.Rect(200,500,100,50), *[[TextBox(Box(pygame.Rect(0,0,100,50),(255,255,0,255) if i==0 else (190,190,0,255)),Text(f'roll1\nx{banner.price}',30,(247,13,26)))] for banner in page.banners for i in range(2)],
+		page.buttons['roll1'] = SimpleButton(pygame.Rect(200,500,100,50), *[[TextBox(pygame.Rect(0,0,100,50),(255,255,0,255) if i==0 else (190,190,0,255),text=f'roll1\nx{banner.price}',textsize=30,textcolor=(247,13,26))] for banner in page.banners for i in range(2)],
 			callback=lambda: page.roll(1))
 		
-		page.buttons['roll10'] = SimpleButton(pygame.Rect(769,500,100,50), *[[TextBox(Box(pygame.Rect(0,0,100,50),(255,255,0,255) if i==0 else (190,190,0,255)),Text(f'roll10\nx{10*banner.price}',30,(247,13,26)))] for banner in page.banners for i in range(2)],
+		page.buttons['roll10'] = SimpleButton(pygame.Rect(769,500,100,50), *[[TextBox(pygame.Rect(0,0,100,50),(255,255,0,255) if i==0 else (190,190,0,255),text=f'roll10\nx{10*banner.price}',textsize=30,textcolor=(247,13,26))] for banner in page.banners for i in range(2)],
 			callback=lambda: page.roll(10))
 		'''
-		page.buttons['goMission'] = SimpleButton(pygame.Rect(790,25,50,50), [TextBox(Box(pygame.Rect(0,0,50,50),(255,255,0,255)),Text('Quest',18,(247,13,26)))], [TextBox(Box(pygame.Rect(0,0,50,50),(190,190,0,255)),Text('Quest',18,(247,13,26)))],
+		page.buttons['goMission'] = SimpleButton(pygame.Rect(790,25,50,50), [TextBoxOldx(Box(pygame.Rect(0,0,50,50),(255,255,0,255)),Text('Quest',18,(247,13,26)))], [TextBoxOldx(Box(pygame.Rect(0,0,50,50),(190,190,0,255)),Text('Quest',18,(247,13,26)))],
 			callback=lambda: page.game.change_scene('Missions'))
 		
-		page.buttons['goParty'] = SimpleButton(pygame.Rect(855,25,50,50), [TextBox(Box(pygame.Rect(0,0,50,50),(255,255,0,255)),Text('Party',18,(247,13,26)))], [TextBox(Box(pygame.Rect(0,0,50,50),(190,190,0,255)),Text('Party',18,(247,13,26)))],
+		page.buttons['goParty'] = SimpleButton(pygame.Rect(855,25,50,50), [TextBoxOldx(Box(pygame.Rect(0,0,50,50),(255,255,0,255)),Text('Party',18,(247,13,26)))], [TextBoxOldx(Box(pygame.Rect(0,0,50,50),(190,190,0,255)),Text('Party',18,(247,13,26)))],
 			callback=lambda: page.game.change_scene('TeamUp'))
 		'''
-		page.buttons['goArchive'] = SimpleButton(pygame.Rect(920,25,50,50), [TextBox(Box(pygame.Rect(0,0,50,50),(255,255,0,255)),Text('Archive',18,(247,13,26)))], [TextBox(Box(pygame.Rect(0,0,50,50),(190,190,0,255)),Text('Archive',18,(247,13,26)))],
+		page.buttons['goArchive'] = SimpleButton(pygame.Rect(920,25,50,50), [TextBox(pygame.Rect(0,0,50,50),(255,255,0,255),text='Archive',textsize=18,textcolor=(247,13,26))], [TextBox(pygame.Rect(0,0,50,50),(190,190,0,255),text='Archive',textsize=18,textcolor=(247,13,26))],
 			callback=lambda: page.game.change_scene('ArchivePage'))
 		
-		page.buttons['goOption'] = SimpleButton(pygame.Rect(985,25,50,50), [TextBox(Box(pygame.Rect(0,0,50,50),(255,255,0,255)),Text('Option',18,(247,13,26)))], [TextBox(Box(pygame.Rect(0,0,50,50),(190,190,0,255)),Text('Option',18,(247,13,26)))],
+		page.buttons['goOption'] = SimpleButton(pygame.Rect(985,25,50,50), [TextBox(pygame.Rect(0,0,50,50),(255,255,0,255),text='Option',textsize=18,textcolor=(247,13,26))], [TextBox(pygame.Rect(0,0,50,50),(190,190,0,255),text='Option',textsize=18,textcolor=(247,13,26))],
 			callback=lambda: page.game.change_scene('OptionPage'))
 		
 
 		page.displayroll['vig'] = VignetteLayer(page.game)
 		page.displayroll['reward'] = pygame.sprite.Group()
-		page.displayroll['value'] = TextBox(Box(pygame.Rect(__class__.DISPLAYROLL_TOPCENTER[0]-65,400,130,40),(225,225,225)),Text(f'worth: {0}',32,(225,130,0)))
+		page.displayroll['value'] = TextBox(pygame.Rect(__class__.DISPLAYROLL_TOPCENTER[0]-65,400,130,40),(225,225,225),text=f'worth: {0}',textsize=32,textcolor=(225,130,0))
 
 	def enter(page):
 		page.bg = page.currentBanner().bg
@@ -124,17 +125,18 @@ class GachaPlace(Scene):
 			r,c = i//__class__.DISPLAYROLL_CMAX,i%__class__.DISPLAYROLL_CMAX
 			page.displayroll['reward'].add(Image(chardrop.getIcon(bg=True),(tcx-40+(c-2)*120,tcy+r*100)))
 			sum_power += chardrop.power
-		page.displayroll['value'].text.update(newtext=f'worth: {sum_power}')
+		page.displayroll['value'].text = f'worth: {sum_power}'
 		page.displayroll['value'].update()
 		page.showroll = True
 	
 	def reload_currency(page,delta=0):
 		page.game.currency += delta
-		page.ui['kurenzy'].text.update(f'kurenzy: {page.game.currency}')
-		page.ui['kurenzy'].resize_fit(padding=5)
+		page.ui['kurenzy'].text = f'kurenzy: {page.game.currency}'
+		page.ui['kurenzy'].updateText()
+		page.ui['kurenzy'].fittotext(padding=5)
 
-		page.ui['tooltip'].x = page.ui['kurenzy'].box.rect.right+10
-		page.ui['tooltip'].y = page.ui['kurenzy'].box.rect.top+3
+		page.ui['tooltip'].x = page.ui['kurenzy'].rect.right+10
+		page.ui['tooltip'].y = page.ui['kurenzy'].rect.top+3
 		page.ui['tooltip'].repostooltip()
 		
 	def currentBanner(page):
@@ -149,6 +151,8 @@ class GachaPlace(Scene):
 
 	class Banner:
 		DIR_IMAGE = 'data/images/banners/'
+		DAFAULT_BANNER_IMAGE = pygame.image.load(DIR_IMAGE+'banner_default.png')
+		#CHESTTHATGOTOTHECENTER = pygame.image.load('data/images/chest_no_bar.png')
 		def __init__(self,page,id,name,list,chance,price,img):
 			self.id = id
 			self.name = name
@@ -161,12 +165,14 @@ class GachaPlace(Scene):
 
 			if Path(__class__.DIR_IMAGE + img).is_file():
 				self.bg = pygame.transform.scale(pygame.image.load(__class__.DIR_IMAGE + img).convert_alpha(), page.game.screen.get_size())
-				title = Text(self.name,67,(255,255,255))
-				title.rect = title.image.get_rect(center=(1067/2,100))
+				self.bg.blit(__class__.DAFAULT_BANNER_IMAGE,(0,0))
+				#self.bg.blit(__class__.CHESTTHATGOTOTHECENTER,(0,0))
+				title = TextBox(text=self.name,textsize=67,textcolor=(255,255,255))
+				title.rect.center = (1067/2,100)
 				title.draw(self.bg)
 			else:
 				self.bg = pygame.surface(page.game.screen.get_size())
-				Text(self.id,antialias=False).draw()
+				TextBox(text=self.id,antialias=False).draw()
 
 		def singleroll(self):
 				'''return a Character Class'''
