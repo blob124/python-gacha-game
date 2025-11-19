@@ -16,7 +16,7 @@ pygame.init()
 class Game:
 	def __init__(game):
 		game.screen = pygame.display.set_mode((1067, 600))
-		pygame.display.set_caption("Gacha Gambling")
+		pygame.display.set_caption("Hop & Hope")
 		game.clock = pygame.time.Clock()
 
 		game.loadData()
