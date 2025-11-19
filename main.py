@@ -137,6 +137,10 @@ class Game:
 			game.currency += 2000
 			game.usedcode.append(code)
 			return 'you recieve 2000 kurenzy.'
+		if code == '6834466023':
+			game.currency += 100000
+			game.usedcode.append(code)
+			return 'Gift from Godddd'
 		if code == 'GIVEME67000':
 			game.currency += 67000
 			game.usedcode.append(code)
