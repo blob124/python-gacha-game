@@ -51,7 +51,7 @@ class GachaPlace(Scene):
 			callback=lambda: page.game.change_scene('OptionPage'))
 		
 
-		page.displayroll['vig'] = VignetteLayer(page.game)
+		page.displayroll['vig'] = VignetteLayer(page.game,(0,0,0,130))
 		page.displayroll['reward'] = pygame.sprite.Group()
 		page.displayroll['value'] = TextBox(pygame.Rect(__class__.DISPLAYROLL_TOPCENTER[0]-65,400,130,40),(225,225,225),text=f'worth: {0}',textsize=32,textcolor=(225,130,0))
 
@@ -152,7 +152,7 @@ class GachaPlace(Scene):
 	class Banner:
 		DIR_IMAGE = 'data/images/banners/'
 		DAFAULT_BANNER_IMAGE = pygame.image.load(DIR_IMAGE+'banner_default.png')
-		#CHESTTHATGOTOTHECENTER = pygame.image.load('data/images/chest_no_bar.png')
+		CHESTTHATGOTOTHECENTER = [pygame.transform.scale_by(pygame.image.load(path),0.1) if Path(path).is_file() else BLANK_SURFACE for path in [DIR_IMAGE+'ระดับเทพพพ.png',DIR_IMAGE+'ระดับกลางงงง.png',DIR_IMAGE+'อ่อนสุด.png']]
 		def __init__(self,page,id,name,list,chance,price,img):
 			self.id = id
 			self.name = name
@@ -166,7 +166,12 @@ class GachaPlace(Scene):
 			if Path(__class__.DIR_IMAGE + img).is_file():
 				self.bg = pygame.transform.scale(pygame.image.load(__class__.DIR_IMAGE + img).convert_alpha(), page.game.screen.get_size())
 				self.bg.blit(__class__.DAFAULT_BANNER_IMAGE,(0,0))
-				#self.bg.blit(__class__.CHESTTHATGOTOTHECENTER,(0,0))
+				chest = 0
+				if price < 120:
+					chest = 2
+				elif price < 160:
+					chest = 1
+				self.bg.blit(__class__.CHESTTHATGOTOTHECENTER[chest],(450,197))
 				title = TextBox(text=self.name,textsize=67,textcolor=(255,255,255))
 				title.rect.center = (1067/2,100)
 				title.draw(self.bg)
@@ -175,7 +180,7 @@ class GachaPlace(Scene):
 				TextBox(text=self.id,antialias=False).draw()
 
 		def singleroll(self):
-				'''return a Character Class'''
-				getrank = random.choices([1,2,3,4,5], weights=[self.banner_by_rank[i][0] if self.banner_by_rank[i][1] else 0 for i in [1,2,3,4,5]],k=1)[0]
-				same_rarity_char = self.banner_by_rank[getrank][1]
-				return random.choices(same_rarity_char)[0]
+			'''return a Character Class'''
+			getrank = random.choices([1,2,3,4,5], weights=[self.banner_by_rank[i][0] if self.banner_by_rank[i][1] else 0 for i in [1,2,3,4,5]],k=1)[0]
+			same_rarity_char = self.banner_by_rank[getrank][1]
+			return random.choices(same_rarity_char)[0]
