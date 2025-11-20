@@ -17,7 +17,7 @@ class Settings(Scene):
 		checkbox1 = pygame.image.load(f'data/images/checkbox_1.png').convert_alpha()
 
 		page.ui['music-input'] = Interactable((600,150), [pygame.Rect(4,4,32,32),Image(checkbox0)], [pygame.Rect(4,4,32,32),Image(checkbox0)], [pygame.Rect(4,4,32,32),Image(checkbox1)], [pygame.Rect(4,4,32,32),Image(checkbox1)],
-			callback=lambda: (page.game.toggle_music(), setattr(page.inputbox['music'], 'state', 1 if page.game.musicplaying else 0)))
+			callback=lambda: (page.game.toggle_music(), setattr(page.ui['music-input'], 'state', 1 if page.game.musicplaying else 0)))
 		page.ui['music-input'].state = 1
 
 		page.ui['redeem-input'] = CoolTextBox(TextBox(pygame.Rect(600,250,400,40),bgcolor=(255,255,255),text='defaultText',align='left'),callback=lambda: page.updatewarningbox(page.game.enterCode(page.ui['redeem-input'].text.text)))
